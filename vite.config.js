@@ -19,10 +19,24 @@ export default defineConfig({
         short_name: 'TCHB',
         description: 'Application mobile TCHB',
         theme_color: '#ffffff',
-        background_color: '#ffffff',
+        background_color: '#040c57',
         display: 'standalone',
         start_url: '/',
         scope: '/',
+
+        icons: [
+        {
+          src: '/icons/tchb-icone.jpg',
+          sizes: '192x192',
+          type: 'image/png',
+        },
+        {
+          src: '/icons/tchb-icone2.jpg',
+          sizes: '512x512',
+          type: 'image/png',
+        },
+     ],
+
       },
     }),
   ],
