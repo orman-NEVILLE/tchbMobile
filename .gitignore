@@ -23,7 +23,8 @@ coverage
 *.njsproj
 *.sln
 *.sw?
-
+*.mp4
+*.mp3
 *.tsbuildinfo
 
 .eslintcache

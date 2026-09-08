@@ -105,7 +105,21 @@ const preaching = computed(() => {
         </div>
 
       </section>
+        <!-- Vidéo -->
+        <section class="video-card">
+        <video
+            class="preaching-video"
+            controls
+            preload="metadata"
+        >
+            <source
+            :src="preaching.video"
+            type="video/mp4"
+            />
 
+            Votre navigateur ne prend pas en charge la lecture vidéo.
+        </video>
+        </section>
       <!-- Informations -->
       <section class="info-card">
 
@@ -280,7 +294,86 @@ const preaching = computed(() => {
   font-size: 13px;
   line-height: 1.5;
 }
+/* =========================
+   Vidéo
+========================= */
 
+.video-card {
+  overflow: hidden;
+
+  background: #000000;
+
+  border: 1px solid #e9ecef;
+  border-radius: 14px;
+}
+
+.preaching-video {
+  display: block;
+
+  width: 100%;
+  aspect-ratio: 16 / 9;
+
+  background: #000000;
+}
+
+/* =========================
+   Audio
+========================= */
+
+.audio-card {
+  padding: 18px;
+
+  background: #ffffff;
+  border: 1px solid #e9ecef;
+  border-radius: 14px;
+}
+
+.audio-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  margin-bottom: 16px;
+}
+
+.audio-icon {
+  width: 42px;
+  height: 42px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 10px;
+
+  background: #f1f3f5;
+  color: #111827;
+}
+
+.audio-header h2 {
+  margin: 0;
+
+  color: #111827;
+
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.audio-header p {
+  margin: 4px 0 0;
+
+  color: #9ca3af;
+
+  font-size: 12px;
+}
+
+.preaching-audio {
+  display: block;
+
+  width: 100%;
+}
 /* =========================
    Informations
 ========================= */
