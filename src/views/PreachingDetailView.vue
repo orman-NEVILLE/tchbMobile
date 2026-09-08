@@ -7,10 +7,40 @@ import {
   User,
 } from 'lucide-vue-next'
 
-import { computed } from 'vue'
+import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
+const audioElement = ref(null)
+const videoElement = ref(null)
+
+const handleVideoClick = (event) => {
+  if (!videoElement.value) {
+    return
+  }
+
+  const video = videoElement.value
+
+  const rect = video.getBoundingClientRect()
+
+  const clickPosition = event.clientX - rect.left
+
+  const videoWidth = rect.width
+
+  const middle = videoWidth / 2
+
+  if (clickPosition < middle) {
+    video.currentTime = Math.max(
+      0,
+      video.currentTime - 10
+    )
+  } else {
+    video.currentTime = Math.min(
+      video.duration,
+      video.currentTime + 10
+    )
+  }
+}
 
 const preachings = [
     {
@@ -106,20 +136,52 @@ const preaching = computed(() => {
 
       </section>
         <!-- Vidéo -->
-        <section class="video-card">
         <video
-            class="preaching-video"
-            controls
-            preload="metadata"
+        ref="videoElement"
+        class="preaching-video"
+        controls
+        preload="metadata"
+        @click="handleVideoClick"
         >
-            <source
+        <source
             :src="preaching.video"
             type="video/mp4"
-            />
+        />
 
-            Votre navigateur ne prend pas en charge la lecture vidéo.
+        Votre navigateur ne prend pas en charge la lecture vidéo.
         </video>
-        </section>
+
+    <!-- Audio -->
+    <section class="audio-card">
+
+    <div class="audio-header">
+        <div class="audio-icon">
+        <Mic2 :size="20" />
+        </div>
+
+        <div>
+        <h2>Écouter la prédication</h2>
+
+        <p>
+            Écoutez uniquement l'audio de cet enseignement.
+        </p>
+        </div>
+    </div>
+
+    <audio
+        class="preaching-audio"
+        controls
+        preload="metadata"
+    >
+        <source
+        :src="preaching.audio"
+        type="audio/mpeg"
+        />
+
+        Votre navigateur ne prend pas en charge la lecture audio.
+    </audio>
+
+    </section>
       <!-- Informations -->
       <section class="info-card">
 
