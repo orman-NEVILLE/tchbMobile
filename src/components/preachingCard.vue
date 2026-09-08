@@ -10,13 +10,19 @@ defineProps({
 </script>
 
 <template>
-  <article class="preaching-card">
-
+  <RouterLink
+    :to="`/predications/${preaching.id}`"
+    class="preaching-card"
+  >
     <!-- Zone de lecture -->
     <div class="thumbnail">
-      <button class="play-button" aria-label="Lire la prédication">
-        <Play :size="20" :stroke-width="2.5" fill="currentColor" />
-      </button>
+      <div class="play-button">
+        <Play
+          :size="20"
+          :stroke-width="2.5"
+          fill="currentColor"
+        />
+      </div>
     </div>
 
     <!-- Informations -->
@@ -46,8 +52,7 @@ defineProps({
       </div>
 
     </div>
-
-  </article>
+  </RouterLink>
 </template>
 
 <style scoped>
@@ -57,7 +62,11 @@ defineProps({
 
   padding: 12px;
 
+  color: inherit;
+  text-decoration: none;
+
   background: #ffffff;
+
   border: 1px solid #e9ecef;
   border-radius: 14px;
 
@@ -68,16 +77,19 @@ defineProps({
 
 .preaching-card:hover {
   transform: translateY(-2px);
+
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
 }
 
-/* Image / lecture */
+/* =========================
+   THUMBNAIL
+========================= */
 
 .thumbnail {
-  flex-shrink: 0;
-
   width: 92px;
   height: 92px;
+
+  flex-shrink: 0;
 
   display: flex;
   align-items: center;
@@ -96,25 +108,21 @@ defineProps({
   align-items: center;
   justify-content: center;
 
-  border: none;
   border-radius: 50%;
 
   background: #111827;
   color: #ffffff;
 
-  cursor: pointer;
-
-  transition:
-    transform 0.2s ease,
-    background 0.2s ease;
+  transition: transform 0.2s ease;
 }
 
-.play-button:hover {
+.preaching-card:hover .play-button {
   transform: scale(1.05);
-  background: #000000;
 }
 
-/* Contenu */
+/* =========================
+   CONTENT
+========================= */
 
 .content {
   min-width: 0;
@@ -168,7 +176,9 @@ defineProps({
   gap: 3px;
 }
 
-/* Mobile */
+/* =========================
+   MOBILE
+========================= */
 
 @media (max-width: 380px) {
   .thumbnail {
