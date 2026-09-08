@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 
 import HomeView from '@/views/HomeView.vue'
 import PreachingsView from '@/views/PreachingsView.vue'
-import PreachingDetailsView from '@/views/PreachingDetailsView.vue'
+import PreachingDetailView from '@/views/PreachingDetailView.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -20,8 +20,8 @@ const router = createRouter({
     },
     {
       path: '/predications/:id',
-      name: 'preaching-details',
-      component: PreachingDetailsView,
+      name: 'preaching-detail',
+      component: PreachingDetailView,
     },
   ],
 })
