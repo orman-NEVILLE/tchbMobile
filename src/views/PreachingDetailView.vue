@@ -13,15 +13,16 @@ import { useRoute } from 'vue-router'
 const route = useRoute()
 
 const preachings = [
-  {
+    {
     id: 1,
     title: 'La foi qui transforme',
     preacher: 'Pasteur Jean',
     date: '07 Septembre 2026',
     duration: '32:15',
-    description:
-      'Découvrez cet enseignement consacré à la foi et à son importance dans notre marche quotidienne avec Dieu.',
-  },
+    description: '...',
+    video: '/media/videos/predication-1.mp4',
+    audio: '/media/audio/predication-1.mp3',
+    },
   {
     id: 2,
     title: 'Le chemin de la foi',
