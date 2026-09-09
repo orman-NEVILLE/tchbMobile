@@ -34,19 +34,19 @@ defineEmits(['click'])
   border-radius: 50%;
 
   background: transparent;
-  color: #374151;
+  color: var(--color-text-secondary);
 
   cursor: pointer;
 
   transition:
-    background 0.2s ease,
+    background-color 0.2s ease,
     color 0.2s ease,
     transform 0.2s ease;
 }
 
 .profile-button:hover {
-  background: #f3f4f6;
-  color: #111827;
+  background: var(--color-surface-hover);
+  color: var(--color-text);
 }
 
 .profile-button:active {
@@ -63,7 +63,7 @@ defineEmits(['click'])
 
   border-radius: 50%;
 
-  background: #f1f3f5;
-  color: #374151;
+  background: var(--color-surface-secondary);
+  color: var(--color-text-secondary);
 }
 </style>

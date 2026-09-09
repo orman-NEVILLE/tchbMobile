@@ -71,9 +71,10 @@ onBeforeUnmount(() => {
 
         <!-- Profil -->
         <div
-            ref="profileWrapper"
-            class="profile-wrapper"
-            >
+        ref="profileWrapper"
+        class="profile-wrapper"
+        @click.stop
+        >
 
           <ProfileButton
             @click="toggleProfileMenu"
@@ -97,10 +98,14 @@ onBeforeUnmount(() => {
   top: 0;
   z-index: 50;
 
-  background: rgba(255, 255, 255, 0.96);
+  background: var(--color-surface);
   backdrop-filter: blur(10px);
 
-  border-bottom: 1px solid #e9ecef;
+  border-bottom: 1px solid var(--color-border);
+
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease;
 }
 
 .header-content {
@@ -118,14 +123,12 @@ onBeforeUnmount(() => {
   justify-content: space-between;
 }
 
-/* Brand */
-
 .brand {
   display: inline-flex;
   align-items: center;
   gap: 10px;
 
-  color: #111827;
+  color: var(--color-text);
   text-decoration: none;
 }
 
@@ -139,22 +142,20 @@ onBeforeUnmount(() => {
 
   border-radius: 10px;
 
-  background: #111827;
-  color: #ffffff;
+  background: var(--color-text);
+  color: var(--color-surface);
 
   font-size: 16px;
   font-weight: 750;
 }
 
 .brand-name {
-  color: #111827;
+  color: var(--color-text);
 
   font-size: 18px;
   font-weight: 750;
   letter-spacing: 0.3px;
 }
-
-/* Actions */
 
 .header-actions {
   display: flex;
@@ -162,13 +163,9 @@ onBeforeUnmount(() => {
   gap: 8px;
 }
 
-/* Profile */
-
 .profile-wrapper {
   position: relative;
 }
-
-/* Mobile */
 
 @media (max-width: 480px) {
   .header-content {

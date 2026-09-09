@@ -44,26 +44,25 @@ const props = defineProps({
   border-radius: 50%;
 
   background: transparent;
-  color: #4b5563;
+  color: var(--color-text-secondary);
 
   cursor: pointer;
 
   transition:
-    background 0.2s ease,
+    background-color 0.2s ease,
     color 0.2s ease,
     transform 0.2s ease;
 }
 
 .notification-button:hover {
-  background: #f3f4f6;
-  color: #111827;
+  background: var(--color-surface-hover);
+  color: var(--color-text);
 }
 
 .notification-button:active {
   transform: scale(0.96);
 }
 
-/* Badge */
 .notification-badge {
   position: absolute;
   top: 4px;
@@ -79,11 +78,11 @@ const props = defineProps({
   padding: 0 3px;
   box-sizing: border-box;
 
-  border: 2px solid #ffffff;
+  border: 2px solid var(--color-surface);
   border-radius: 20px;
 
-  background: #111827;
-  color: #ffffff;
+  background: var(--color-text);
+  color: var(--color-surface);
 
   font-size: 8px;
   font-weight: 700;

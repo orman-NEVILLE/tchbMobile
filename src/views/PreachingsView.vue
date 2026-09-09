@@ -61,15 +61,23 @@ const filteredPreachings = computed(() => {
 <template>
   <div class="preachings-page">
 
-    <!-- En-tête -->
+    <!-- =========================
+         EN-TÊTE
+    ========================== -->
+
     <section class="page-header">
 
       <div class="page-icon">
-        <Mic2 :size="22" :stroke-width="2" />
+        <Mic2
+          :size="22"
+          :stroke-width="2"
+        />
       </div>
 
-      <div>
-        <h1>Prédications</h1>
+      <div class="page-header-content">
+        <h1>
+          Prédications
+        </h1>
 
         <p>
           Découvrez nos enseignements et grandissez dans la foi.
@@ -78,7 +86,11 @@ const filteredPreachings = computed(() => {
 
     </section>
 
-    <!-- Recherche -->
+
+    <!-- =========================
+         RECHERCHE
+    ========================== -->
+
     <div class="search-box">
 
       <Search
@@ -96,45 +108,61 @@ const filteredPreachings = computed(() => {
 
     </div>
 
-    <!-- Résultats -->
+
+    <!-- =========================
+         RÉSULTATS
+    ========================== -->
+
     <section class="results-section">
 
       <div class="results-header">
+
         <h2>
           {{ search ? 'Résultats' : 'Toutes les prédications' }}
         </h2>
 
-        <span>
+        <span class="results-count">
           {{ filteredPreachings.length }}
         </span>
+
       </div>
 
+
       <!-- Liste -->
+
       <div
         v-if="filteredPreachings.length"
         class="preachings-list"
       >
+
         <PreachingCard
           v-for="preaching in filteredPreachings"
           :key="preaching.id"
           :preaching="preaching"
         />
+
       </div>
 
+
       <!-- Aucun résultat -->
+
       <div
         v-else
         class="empty-state"
       >
+
         <div class="empty-icon">
           <Search :size="24" />
         </div>
 
-        <h3>Aucune prédication trouvée</h3>
+        <h3>
+          Aucune prédication trouvée
+        </h3>
 
         <p>
           Essayez avec un autre titre ou nom de prédicateur.
         </p>
+
       </div>
 
     </section>
@@ -143,11 +171,21 @@ const filteredPreachings = computed(() => {
 </template>
 
 <style scoped>
+/* =========================
+   PAGE
+========================= */
+
 .preachings-page {
   display: flex;
   flex-direction: column;
+
   gap: 24px;
+
+  color: var(--color-text);
+
+  transition: color 0.25s ease;
 }
+
 
 /* =========================
    EN-TÊTE
@@ -156,6 +194,7 @@ const filteredPreachings = computed(() => {
 .page-header {
   display: flex;
   align-items: center;
+
   gap: 14px;
 }
 
@@ -171,28 +210,41 @@ const filteredPreachings = computed(() => {
 
   border-radius: 12px;
 
-  background: #111827;
-  color: #ffffff;
+  background: var(--color-text);
+  color: var(--color-surface);
+
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease;
+}
+
+.page-header-content {
+  min-width: 0;
 }
 
 .page-header h1 {
   margin: 0;
 
-  color: #111827;
+  color: var(--color-text);
 
   font-size: 24px;
   font-weight: 750;
   letter-spacing: -0.3px;
+
+  transition: color 0.25s ease;
 }
 
 .page-header p {
   margin: 4px 0 0;
 
-  color: #6b7280;
+  color: var(--color-text-secondary);
 
   font-size: 13px;
   line-height: 1.5;
+
+  transition: color 0.25s ease;
 }
+
 
 /* =========================
    RECHERCHE
@@ -207,11 +259,14 @@ const filteredPreachings = computed(() => {
 
 .search-icon {
   position: absolute;
+
   left: 15px;
 
-  color: #9ca3af;
+  color: var(--color-text-muted);
 
   pointer-events: none;
+
+  transition: color 0.25s ease;
 }
 
 .search-box input {
@@ -222,32 +277,35 @@ const filteredPreachings = computed(() => {
 
   padding: 0 16px 0 45px;
 
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--color-border);
   border-radius: 12px;
 
   outline: none;
 
-  background: #ffffff;
-
-  color: #111827;
+  background: var(--color-surface);
+  color: var(--color-text);
 
   font-family: inherit;
   font-size: 14px;
 
   transition:
+    background-color 0.25s ease,
+    color 0.25s ease,
     border-color 0.2s ease,
     box-shadow 0.2s ease;
 }
 
 .search-box input::placeholder {
-  color: #9ca3af;
+  color: var(--color-text-muted);
 }
 
 .search-box input:focus {
-  border-color: #9ca3af;
+  border-color: var(--color-text-secondary);
 
-  box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.06);
+  box-shadow:
+    0 0 0 3px rgba(156, 163, 175, 0.12);
 }
+
 
 /* =========================
    RÉSULTATS
@@ -256,6 +314,7 @@ const filteredPreachings = computed(() => {
 .results-section {
   display: flex;
   flex-direction: column;
+
   gap: 14px;
 }
 
@@ -263,18 +322,22 @@ const filteredPreachings = computed(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
+
+  gap: 12px;
 }
 
 .results-header h2 {
   margin: 0;
 
-  color: #111827;
+  color: var(--color-text);
 
   font-size: 17px;
   font-weight: 700;
+
+  transition: color 0.25s ease;
 }
 
-.results-header span {
+.results-count {
   min-width: 24px;
   height: 24px;
 
@@ -288,22 +351,32 @@ const filteredPreachings = computed(() => {
 
   border-radius: 20px;
 
-  background: #eef0f3;
-
-  color: #6b7280;
+  background: var(--color-surface-secondary);
+  color: var(--color-text-secondary);
 
   font-size: 12px;
   font-weight: 600;
+
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease;
 }
+
+
+/* =========================
+   LISTE
+========================= */
 
 .preachings-list {
   display: flex;
   flex-direction: column;
+
   gap: 12px;
 }
 
+
 /* =========================
-   EMPTY STATE
+   AUCUN RÉSULTAT
 ========================= */
 
 .empty-state {
@@ -315,10 +388,14 @@ const filteredPreachings = computed(() => {
 
   text-align: center;
 
-  background: #ffffff;
+  background: var(--color-surface);
 
-  border: 1px solid #e9ecef;
+  border: 1px solid var(--color-border);
   border-radius: 14px;
+
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease;
 }
 
 .empty-icon {
@@ -333,17 +410,23 @@ const filteredPreachings = computed(() => {
 
   border-radius: 50%;
 
-  background: #f1f3f5;
-  color: #6b7280;
+  background: var(--color-surface-secondary);
+  color: var(--color-text-secondary);
+
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease;
 }
 
 .empty-state h3 {
   margin: 0;
 
-  color: #111827;
+  color: var(--color-text);
 
   font-size: 15px;
   font-weight: 650;
+
+  transition: color 0.25s ease;
 }
 
 .empty-state p {
@@ -351,11 +434,14 @@ const filteredPreachings = computed(() => {
 
   margin: 6px 0 0;
 
-  color: #9ca3af;
+  color: var(--color-text-muted);
 
   font-size: 13px;
   line-height: 1.5;
+
+  transition: color 0.25s ease;
 }
+
 
 /* =========================
    MOBILE
@@ -368,6 +454,16 @@ const filteredPreachings = computed(() => {
 
   .page-header p {
     font-size: 12px;
+  }
+
+  .search-box input {
+    height: 46px;
+
+    font-size: 13px;
+  }
+
+  .results-header h2 {
+    font-size: 16px;
   }
 }
 </style>

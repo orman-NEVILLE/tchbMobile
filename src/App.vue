@@ -53,7 +53,13 @@ import AppHeader from '@/components/AppHeader.vue'
 <style scoped>
 .app {
   min-height: 100vh;
-  background: #f8f9fb;
+
+  background: var(--color-background);
+  color: var(--color-text);
+
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease;
 }
 
 .app-content {
@@ -64,7 +70,9 @@ import AppHeader from '@/components/AppHeader.vue'
   padding: 24px 20px 100px;
 }
 
-/* Navigation */
+/* =========================
+   Navigation
+   ========================= */
 
 .bottom-navigation {
   position: fixed;
@@ -82,10 +90,15 @@ import AppHeader from '@/components/AppHeader.vue'
 
   gap: 80px;
 
-  background: rgba(255, 255, 255, 0.96);
+  background: var(--color-surface);
+
   backdrop-filter: blur(10px);
 
-  border-top: 1px solid #e9ecef;
+  border-top: 1px solid var(--color-border);
+
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease;
 }
 
 .nav-item {
@@ -98,7 +111,8 @@ import AppHeader from '@/components/AppHeader.vue'
 
   gap: 5px;
 
-  color: #9ca3af;
+  color: var(--color-text-muted);
+
   text-decoration: none;
 
   font-size: 12px;
@@ -110,11 +124,12 @@ import AppHeader from '@/components/AppHeader.vue'
 }
 
 .nav-item:hover {
-  color: #374151;
+  color: var(--color-text-secondary);
 }
 
 .nav-item.router-link-active {
-  color: #111827;
+  color: var(--color-text);
+
   font-weight: 600;
 }
 
@@ -131,5 +146,73 @@ import AppHeader from '@/components/AppHeader.vue'
     padding-left: 16px;
     padding-right: 16px;
   }
+}
+</style>
+
+<style>
+:root {
+  --color-background: #f8f9fb;
+
+  --color-surface: #ffffff;
+  --color-surface-secondary: #f1f3f5;
+  --color-surface-hover: #f3f4f6;
+
+  --color-text: #111827;
+  --color-text-secondary: #374151;
+  --color-text-muted: #9ca3af;
+
+  --color-border: #e9ecef;
+
+  --shadow-menu:
+    0 10px 30px rgba(17, 24, 39, 0.10),
+    0 2px 8px rgba(17, 24, 39, 0.06);
+}
+
+html.theme-dark {
+  --color-background: #0f1115;
+
+  --color-surface: #181b21;
+  --color-surface-secondary: #22262e;
+  --color-surface-hover: #272c35;
+
+  --color-text: #f3f4f6;
+  --color-text-secondary: #d1d5db;
+  --color-text-muted: #9ca3af;
+
+  --color-border: #2d333d;
+
+  --shadow-menu:
+    0 10px 30px rgba(0, 0, 0, 0.35),
+    0 2px 8px rgba(0, 0, 0, 0.20);
+}
+
+html,
+body,
+#app {
+  min-height: 100%;
+}
+
+html {
+  background: var(--color-background);
+
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease;
+}
+
+body {
+  margin: 0;
+
+  background: var(--color-background);
+  color: var(--color-text);
+
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
 }
 </style>

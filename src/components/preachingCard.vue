@@ -57,14 +57,30 @@ defineProps({
 
   padding: 12px;
 
-  background: #ffffff;
-  border: 1px solid #e9ecef;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: 14px;
 
   text-decoration: none;
-  color: inherit;
+  color: var(--color-text);
+
   cursor: pointer;
+
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease,
+    transform 0.2s ease;
 }
+
+.preaching-card:hover {
+  background: var(--color-surface-hover);
+}
+
+.preaching-card:active {
+  transform: scale(0.99);
+}
+
+/* Miniature */
 
 .thumbnail {
   width: 92px;
@@ -78,8 +94,12 @@ defineProps({
 
   border-radius: 10px;
 
-  background: #eef1f5;
+  background: var(--color-surface-secondary);
+
+  transition: background-color 0.25s ease;
 }
+
+/* Bouton lecture */
 
 .play-button {
   width: 42px;
@@ -92,40 +112,63 @@ defineProps({
   border: none;
   border-radius: 50%;
 
-  background: #111827;
-  color: #ffffff;
+  background: var(--color-text);
+  color: var(--color-surface);
+
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease,
+    transform 0.2s ease;
 }
+
+.preaching-card:hover .play-button {
+  transform: scale(1.05);
+}
+
+/* Contenu */
 
 .content {
   min-width: 0;
   flex: 1;
 }
 
+/* Titre */
+
 .title {
   margin: 0;
 
-  color: #111827;
+  color: var(--color-text);
 
   font-size: 15px;
   font-weight: 650;
+
+  transition: color 0.25s ease;
 }
+
+/* Prédicateur */
 
 .preacher {
   margin: 6px 0 10px;
 
-  color: #6b7280;
+  color: var(--color-text-secondary);
 
   font-size: 13px;
+
+  transition: color 0.25s ease;
 }
+
+/* Métadonnées */
 
 .metadata {
   display: flex;
   align-items: center;
   gap: 6px;
 
-  color: #9ca3af;
+  color: var(--color-text-muted);
 
   font-size: 12px;
+
+  transition: color 0.25s ease;
 }
 
 .duration {
@@ -135,6 +178,6 @@ defineProps({
 }
 
 .separator {
-  color: #d1d5db;
+  color: var(--color-border);
 }
 </style>
