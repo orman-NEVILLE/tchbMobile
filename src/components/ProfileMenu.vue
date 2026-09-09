@@ -3,6 +3,7 @@ import {
   Check,
   ChevronRight,
   LogIn,
+  LogOut,
   Moon,
   Sun,
   Monitor,
@@ -10,10 +11,27 @@ import {
 } from 'lucide-vue-next'
 
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 
+import { useAuth } from '@/composables/useAuth'
 import { useTheme } from '@/composables/useTheme'
 
-const { theme, setTheme } = useTheme()
+const router = useRouter()
+
+const {
+  user,
+  isAuthenticated,
+  logout,
+} = useAuth()
+
+const {
+  theme,
+  setTheme,
+} = useTheme()
+
+const emit = defineEmits([
+  'close',
+])
 
 const showAppearance = ref(false)
 
@@ -38,68 +56,177 @@ const themes = [
 const selectTheme = (themeId) => {
   setTheme(themeId)
 }
+
+const handleLogout = () => {
+  logout()
+
+  showAppearance.value = false
+
+  emit('close')
+
+  router.push('/')
+}
 </script>
 
 <template>
   <div class="profile-menu">
 
-    <!-- Menu principal -->
+    <!-- =========================
+         MENU PRINCIPAL
+    ========================== -->
 
     <template v-if="!showAppearance">
 
-      <button
-        type="button"
-        class="menu-item"
-      >
-        <span class="menu-icon">
-          <User :size="18" />
-        </span>
+      <!-- UTILISATEUR NON CONNECTÉ -->
+      <template v-if="!isAuthenticated">
 
-        <span class="menu-content">
-          <strong>Mon profil</strong>
-          <small>Voir mon profil</small>
-        </span>
-      </button>
+        <RouterLink
+          to="/profil"
+          class="menu-item menu-link"
+        >
+          <span class="menu-icon">
+            <User :size="18" />
+          </span>
 
-      <button
-        type="button"
-        class="menu-item"
-        @click="showAppearance = true"
-      >
-        <span class="menu-icon">
-          <Sun :size="18" />
-        </span>
+          <span class="menu-content">
+            <strong>
+              Mon profil
+            </strong>
 
-        <span class="menu-content">
-          <strong>Apparence</strong>
-          <small>Modifier le thème</small>
-        </span>
+            <small>
+              Voir mon profil
+            </small>
+          </span>
+        </RouterLink>
 
-        <ChevronRight
-          class="menu-arrow"
-          :size="17"
-        />
-      </button>
+        <button
+          type="button"
+          class="menu-item"
+          @click="
+            showAppearance = true
+          "
+        >
+          <span class="menu-icon">
+            <Sun :size="18" />
+          </span>
 
-      <div class="menu-separator"></div>
+          <span class="menu-content">
+            <strong>
+              Apparence
+            </strong>
 
-      <button
-        type="button"
-        class="menu-item"
-      >
-        <span class="menu-icon">
-          <LogIn :size="18" />
-        </span>
+            <small>
+              Modifier le thème
+            </small>
+          </span>
 
-        <span class="menu-content">
-          <strong>Connexion</strong>
-          <small>Se connecter à TCHB</small>
-        </span>
-      </button>
+          <ChevronRight
+            class="menu-arrow"
+            :size="17"
+          />
+        </button>
+
+        <div class="menu-separator"></div>
+
+        <RouterLink
+          to="/connexion"
+          class="menu-item menu-link"
+        >
+          <span class="menu-icon">
+            <LogIn :size="18" />
+          </span>
+
+          <span class="menu-content">
+            <strong>
+              Connexion
+            </strong>
+
+            <small>
+              Se connecter à TCHB
+            </small>
+          </span>
+        </RouterLink>
+
+      </template>
+
+      <!-- UTILISATEUR CONNECTÉ -->
+      <template v-else>
+
+        <RouterLink
+          to="/profil"
+          class="menu-item menu-link"
+        >
+          <span class="menu-icon">
+            <User :size="18" />
+          </span>
+
+          <span class="menu-content">
+            <strong>
+              {{ user?.name }}
+            </strong>
+
+            <small>
+              Voir mon profil
+            </small>
+          </span>
+        </RouterLink>
+
+        <button
+          type="button"
+          class="menu-item"
+          @click="
+            showAppearance = true
+          "
+        >
+          <span class="menu-icon">
+            <Sun :size="18" />
+          </span>
+
+          <span class="menu-content">
+            <strong>
+              Apparence
+            </strong>
+
+            <small>
+              Modifier le thème
+            </small>
+          </span>
+
+          <ChevronRight
+            class="menu-arrow"
+            :size="17"
+          />
+        </button>
+
+        <div class="menu-separator"></div>
+
+        <button
+          type="button"
+          class="menu-item"
+          @click="handleLogout"
+        >
+          <span class="menu-icon">
+            <LogOut :size="18" />
+          </span>
+
+          <span class="menu-content">
+            <strong>
+              Déconnexion
+            </strong>
+
+            <small>
+              Se déconnecter de TCHB
+            </small>
+          </span>
+        </button>
+
+      </template>
 
     </template>
 
-    <!-- Sous-menu Apparence -->
+    <!-- =========================
+         APPARENCE
+    ========================== -->
 
     <template v-else>
 
@@ -108,7 +235,10 @@ const selectTheme = (themeId) => {
         <button
           type="button"
           class="back-button"
-          @click="showAppearance = false"
+          aria-label="Retour"
+          @click="
+            showAppearance = false
+          "
         >
           <ChevronRight
             :size="17"
@@ -117,8 +247,13 @@ const selectTheme = (themeId) => {
         </button>
 
         <div>
-          <strong>Apparence</strong>
-          <small>Choisissez votre thème</small>
+          <strong>
+            Apparence
+          </strong>
+
+          <small>
+            Choisissez votre thème
+          </small>
         </div>
 
       </div>
@@ -130,8 +265,12 @@ const selectTheme = (themeId) => {
         :key="item.id"
         type="button"
         class="theme-item"
-        :class="{ active: theme === item.id }"
-        @click="selectTheme(item.id)"
+        :class="{
+          active: theme === item.id
+        }"
+        @click="
+          selectTheme(item.id)
+        "
       >
         <span class="theme-icon">
           <component
@@ -168,6 +307,8 @@ const selectTheme = (themeId) => {
 
   padding: 8px;
 
+  box-sizing: border-box;
+
   background: var(--color-surface);
 
   border: 1px solid var(--color-border);
@@ -178,11 +319,13 @@ const selectTheme = (themeId) => {
   z-index: 200;
 
   transition:
-    background 0.25s ease,
+    background-color 0.25s ease,
     border-color 0.25s ease;
 }
 
-/* Menu */
+/* =========================
+   MENU ITEM
+========================= */
 
 .menu-item {
   width: 100%;
@@ -190,6 +333,8 @@ const selectTheme = (themeId) => {
   display: flex;
   align-items: center;
   gap: 11px;
+
+  box-sizing: border-box;
 
   padding: 10px;
 
@@ -203,17 +348,34 @@ const selectTheme = (themeId) => {
 
   cursor: pointer;
 
-  transition: background 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
 }
 
 .menu-item:hover {
   background: var(--color-surface-hover);
 }
 
+.menu-link {
+  text-decoration: none;
+}
+
+.menu-link:visited {
+  color: var(--color-text);
+}
+
+.menu-link:hover {
+  color: var(--color-text);
+}
+
+/* =========================
+   ICON
+========================= */
+
 .menu-icon {
   width: 36px;
   height: 36px;
-
   flex-shrink: 0;
 
   display: flex;
@@ -224,7 +386,15 @@ const selectTheme = (themeId) => {
 
   background: var(--color-surface-secondary);
   color: var(--color-text-secondary);
+
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease;
 }
+
+/* =========================
+   CONTENT
+========================= */
 
 .menu-content {
   min-width: 0;
@@ -236,10 +406,15 @@ const selectTheme = (themeId) => {
 }
 
 .menu-content strong {
+  overflow: hidden;
+
   color: var(--color-text);
 
   font-size: 13px;
   font-weight: 600;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .menu-content small {
@@ -249,8 +424,14 @@ const selectTheme = (themeId) => {
 }
 
 .menu-arrow {
+  flex-shrink: 0;
+
   color: var(--color-text-muted);
 }
+
+/* =========================
+   SEPARATOR
+========================= */
 
 .menu-separator {
   height: 1px;
@@ -260,7 +441,9 @@ const selectTheme = (themeId) => {
   background: var(--color-border);
 }
 
-/* Apparence */
+/* =========================
+   APPEARANCE HEADER
+========================= */
 
 .appearance-header {
   display: flex;
@@ -289,9 +472,14 @@ const selectTheme = (themeId) => {
   font-size: 11px;
 }
 
+/* =========================
+   BACK BUTTON
+========================= */
+
 .back-button {
   width: 34px;
   height: 34px;
+  flex-shrink: 0;
 
   display: flex;
   align-items: center;
@@ -306,17 +494,24 @@ const selectTheme = (themeId) => {
   color: var(--color-text-secondary);
 
   cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
 }
 
 .back-button:hover {
   background: var(--color-surface-hover);
+  color: var(--color-text);
 }
 
 .back-icon {
   transform: rotate(180deg);
 }
 
-/* Thèmes */
+/* =========================
+   THEME
+========================= */
 
 .theme-item {
   width: 100%;
@@ -324,6 +519,8 @@ const selectTheme = (themeId) => {
   display: flex;
   align-items: center;
   gap: 10px;
+
+  box-sizing: border-box;
 
   padding: 9px;
 
@@ -337,7 +534,9 @@ const selectTheme = (themeId) => {
 
   cursor: pointer;
 
-  transition: background 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
 }
 
 .theme-item:hover,
@@ -348,6 +547,7 @@ const selectTheme = (themeId) => {
 .theme-icon {
   width: 34px;
   height: 34px;
+  flex-shrink: 0;
 
   display: flex;
   align-items: center;
@@ -357,10 +557,16 @@ const selectTheme = (themeId) => {
 
   background: var(--color-surface-secondary);
   color: var(--color-text-secondary);
+
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease;
 }
 
 .theme-label {
   flex: 1;
+
+  color: var(--color-text);
 
   font-size: 13px;
   font-weight: 500;
@@ -369,6 +575,7 @@ const selectTheme = (themeId) => {
 .theme-check {
   width: 26px;
   height: 26px;
+  flex-shrink: 0;
 
   display: flex;
   align-items: center;
@@ -378,6 +585,10 @@ const selectTheme = (themeId) => {
 
   color: var(--color-text);
 }
+
+/* =========================
+   MOBILE
+========================= */
 
 @media (max-width: 480px) {
   .profile-menu {

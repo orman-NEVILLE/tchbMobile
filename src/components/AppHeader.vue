@@ -82,6 +82,7 @@ onBeforeUnmount(() => {
 
           <ProfileMenu
             v-if="isProfileMenuOpen"
+            @close="closeProfileMenu"
           />
 
         </div>
