@@ -3,19 +3,15 @@ import {
   Home,
   Mic2,
 } from 'lucide-vue-next'
+
+import AppHeader from '@/components/AppHeader.vue'
 </script>
 
 <template>
   <div class="app">
 
     <!-- Header -->
-    <header class="app-header">
-      <div class="header-content">
-        <div class="logo">
-          TCHB
-        </div>
-      </div>
-    </header>
+    <AppHeader />
 
     <!-- Contenu -->
     <main class="app-content">
@@ -29,7 +25,11 @@ import {
         to="/"
         class="nav-item"
       >
-        <Home :size="22" :stroke-width="2" />
+        <Home
+          :size="22"
+          :stroke-width="2"
+        />
+
         <span>Accueil</span>
       </RouterLink>
 
@@ -37,7 +37,11 @@ import {
         to="/predications"
         class="nav-item"
       >
-        <Mic2 :size="22" :stroke-width="2" />
+        <Mic2
+          :size="22"
+          :stroke-width="2"
+        />
+
         <span>Prédications</span>
       </RouterLink>
 
@@ -52,47 +56,15 @@ import {
   background: #f8f9fb;
 }
 
-/* =========================
-   HEADER
-========================= */
-
-.app-header {
-  position: sticky;
-  top: 0;
-  z-index: 50;
-
-  background: #ffffff;
-  border-bottom: 1px solid #e9ecef;
-}
-
-.header-content {
-  height: 64px;
-  display: flex;
-  align-items: center;
-  padding: 0 20px;
-}
-
-.logo {
-  font-size: 20px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  color: #111827;
-}
-
-/* =========================
-   CONTENT
-========================= */
-
 .app-content {
   max-width: 768px;
+
   margin: 0 auto;
 
   padding: 24px 20px 100px;
 }
 
-/* =========================
-   BOTTOM NAVIGATION
-========================= */
+/* Navigation */
 
 .bottom-navigation {
   position: fixed;
@@ -107,6 +79,7 @@ import {
   display: flex;
   align-items: center;
   justify-content: center;
+
   gap: 80px;
 
   background: rgba(255, 255, 255, 0.96);
@@ -148,10 +121,6 @@ import {
 .nav-item.router-link-active svg {
   stroke-width: 2.5;
 }
-
-/* =========================
-   MOBILE
-========================= */
 
 @media (max-width: 480px) {
   .bottom-navigation {

@@ -23,6 +23,7 @@ const router = createRouter({
       name: 'preaching-detail',
       component: PreachingDetailView,
     },
+
   ],
 })
 
