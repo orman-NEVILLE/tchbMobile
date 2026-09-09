@@ -22,17 +22,32 @@ const props = defineProps({
 const videoElement = ref(null)
 const isPlaying = ref(false)
 
-const togglePlay = () => {
+/* =========================
+   Lecture / pause
+========================= */
+
+const togglePlay = async () => {
   if (!videoElement.value) {
     return
   }
 
-  if (isPlaying.value) {
-    videoElement.value.pause()
-  } else {
-    videoElement.value.play()
+  try {
+    if (isPlaying.value) {
+      videoElement.value.pause()
+    } else {
+      await videoElement.value.play()
+    }
+  } catch (error) {
+    console.error(
+      'Impossible de lire la vidéo :',
+      error
+    )
   }
 }
+
+/* =========================
+   Événements vidéo
+========================= */
 
 const handlePlay = () => {
   isPlaying.value = true
@@ -46,9 +61,10 @@ const handleEnded = () => {
   isPlaying.value = false
 }
 
-/**
- * Reculer de 10 secondes
- */
+/* =========================
+   Reculer de 10 secondes
+========================= */
+
 const rewind = () => {
   if (!videoElement.value) {
     return
@@ -60,11 +76,15 @@ const rewind = () => {
   )
 }
 
-/**
- * Avancer de 10 secondes
- */
+/* =========================
+   Avancer de 10 secondes
+========================= */
+
 const forward = () => {
-  if (!videoElement.value) {
+  if (
+    !videoElement.value ||
+    !Number.isFinite(videoElement.value.duration)
+  ) {
     return
   }
 
@@ -74,12 +94,10 @@ const forward = () => {
   )
 }
 
-/**
- * Clic sur la vidéo
- *
- * Moitié gauche  → -10 secondes
- * Moitié droite → +10 secondes
- */
+/* =========================
+   Clic sur la vidéo
+========================= */
+
 const handleVideoClick = (event) => {
   if (!videoElement.value) {
     return
@@ -89,7 +107,8 @@ const handleVideoClick = (event) => {
 
   const rect = video.getBoundingClientRect()
 
-  const clickPosition = event.clientX - rect.left
+  const clickPosition =
+    event.clientX - rect.left
 
   const middle = rect.width / 2
 
@@ -99,6 +118,10 @@ const handleVideoClick = (event) => {
     forward()
   }
 }
+
+/* =========================
+   Montage
+========================= */
 
 onMounted(() => {
   if (!videoElement.value) {
@@ -120,6 +143,10 @@ onMounted(() => {
     handleEnded
   )
 })
+
+/* =========================
+   Nettoyage
+========================= */
 
 onBeforeUnmount(() => {
   if (!videoElement.value) {
@@ -177,18 +204,29 @@ onBeforeUnmount(() => {
       <button
         type="button"
         class="control-button play"
-        :aria-label="isPlaying ? 'Mettre en pause' : 'Lire'"
+        :aria-label="
+          isPlaying
+            ? 'Mettre en pause'
+            : 'Lire'
+        "
+        :title="
+          isPlaying
+            ? 'Mettre en pause'
+            : 'Lire'
+        "
         @click="togglePlay"
       >
         <Pause
           v-if="isPlaying"
           :size="22"
+          :stroke-width="2.5"
           fill="currentColor"
         />
 
         <Play
           v-else
           :size="22"
+          :stroke-width="2.5"
           fill="currentColor"
         />
       </button>
@@ -211,12 +249,15 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .video-player {
+  width: 100%;
   overflow: hidden;
 
   background: #000000;
 
-  border: 1px solid #e9ecef;
+  border: 1px solid var(--color-border);
   border-radius: 14px;
+
+  transition: border-color 0.25s ease;
 }
 
 /* =========================
@@ -246,7 +287,9 @@ onBeforeUnmount(() => {
 
   padding: 14px;
 
-  background: #ffffff;
+  background: var(--color-surface);
+
+  transition: background-color 0.25s ease;
 }
 
 .control-button {
@@ -254,13 +297,16 @@ onBeforeUnmount(() => {
   align-items: center;
   justify-content: center;
 
+  padding: 0;
+
   border: none;
 
   cursor: pointer;
 
   transition:
     transform 0.15s ease,
-    background 0.2s ease;
+    background-color 0.2s ease,
+    color 0.2s ease;
 }
 
 .control-button:hover {
@@ -271,15 +317,33 @@ onBeforeUnmount(() => {
   transform: scale(0.96);
 }
 
+/* =========================
+   Boutons secondaires
+========================= */
+
 .control-button.secondary {
   width: 38px;
   height: 38px;
 
   border-radius: 50%;
 
-  background: #f1f3f5;
-  color: #6b7280;
+  background: var(--color-surface-secondary);
+  color: var(--color-text-secondary);
+
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease,
+    transform 0.15s ease;
 }
+
+.control-button.secondary:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-text);
+}
+
+/* =========================
+   Bouton principal
+========================= */
 
 .control-button.play {
   width: 50px;
@@ -287,7 +351,35 @@ onBeforeUnmount(() => {
 
   border-radius: 50%;
 
-  background: #111827;
-  color: #ffffff;
+  background: var(--color-text);
+  color: var(--color-surface);
+
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease,
+    transform 0.15s ease;
+}
+
+/* =========================
+   Mobile
+========================= */
+
+@media (max-width: 480px) {
+
+  .video-controls {
+    gap: 10px;
+
+    padding: 12px;
+  }
+
+  .control-button.secondary {
+    width: 36px;
+    height: 36px;
+  }
+
+  .control-button.play {
+    width: 48px;
+    height: 48px;
+  }
 }
 </style>

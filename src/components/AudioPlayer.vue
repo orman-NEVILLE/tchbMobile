@@ -1,11 +1,11 @@
 <script setup>
 import {
+  FastForward,
   Mic2,
   Pause,
   Play,
-  RotateCcw,
   Rewind,
-  FastForward,
+  RotateCcw,
 } from 'lucide-vue-next'
 
 import {
@@ -32,24 +32,40 @@ const isPlaying = ref(false)
 const currentTime = ref(0)
 const duration = ref(0)
 
-const togglePlay = () => {
+/* =========================
+   Lecture / pause
+========================= */
+
+const togglePlay = async () => {
   if (!audioElement.value) {
     return
   }
 
-  if (isPlaying.value) {
-    audioElement.value.pause()
-  } else {
-    audioElement.value.play()
+  try {
+    if (isPlaying.value) {
+      audioElement.value.pause()
+    } else {
+      await audioElement.value.play()
+    }
+  } catch (error) {
+    console.error(
+      'Impossible de lire l’audio :',
+      error
+    )
   }
 }
+
+/* =========================
+   Temps
+========================= */
 
 const updateTime = () => {
   if (!audioElement.value) {
     return
   }
 
-  currentTime.value = audioElement.value.currentTime
+  currentTime.value =
+    audioElement.value.currentTime
 }
 
 const setDuration = () => {
@@ -57,8 +73,13 @@ const setDuration = () => {
     return
   }
 
-  duration.value = audioElement.value.duration
+  duration.value =
+    audioElement.value.duration
 }
+
+/* =========================
+   Événements audio
+========================= */
 
 const handlePlay = () => {
   isPlaying.value = true
@@ -73,23 +94,28 @@ const handleEnded = () => {
   currentTime.value = 0
 }
 
-/**
- * Avancer de 10 secondes
- */
+/* =========================
+   Avancer de 10 secondes
+========================= */
+
 const forward = () => {
-  if (!audioElement.value) {
+  if (
+    !audioElement.value ||
+    !Number.isFinite(duration.value)
+  ) {
     return
   }
 
   audioElement.value.currentTime = Math.min(
-    audioElement.value.duration,
+    duration.value,
     audioElement.value.currentTime + 10
   )
 }
 
-/**
- * Reculer de 10 secondes
- */
+/* =========================
+   Reculer de 10 secondes
+========================= */
+
 const rewind = () => {
   if (!audioElement.value) {
     return
@@ -101,9 +127,10 @@ const rewind = () => {
   )
 }
 
-/**
- * Recommencer
- */
+/* =========================
+   Recommencer
+========================= */
+
 const restart = () => {
   if (!audioElement.value) {
     return
@@ -113,38 +140,58 @@ const restart = () => {
   currentTime.value = 0
 }
 
-/**
- * Cliquer sur la barre de progression
- */
+/* =========================
+   Barre de progression
+========================= */
+
 const seek = (event) => {
-  if (!audioElement.value || !duration.value) {
+  if (
+    !audioElement.value ||
+    !Number.isFinite(duration.value) ||
+    duration.value <= 0
+  ) {
     return
   }
 
-  const rect = event.currentTarget.getBoundingClientRect()
+  const rect =
+    event.currentTarget.getBoundingClientRect()
 
-  const position = event.clientX - rect.left
+  const position =
+    event.clientX - rect.left
 
-  const percentage = position / rect.width
+  const percentage = Math.max(
+    0,
+    Math.min(
+      1,
+      position / rect.width
+    )
+  )
 
   audioElement.value.currentTime =
     percentage * duration.value
 }
 
-/**
- * Format du temps
- */
+/* =========================
+   Format du temps
+========================= */
+
 const formatTime = (time) => {
   if (!Number.isFinite(time)) {
     return '00:00'
   }
 
-  const minutes = Math.floor(time / 60)
+  const minutes =
+    Math.floor(time / 60)
 
-  const seconds = Math.floor(time % 60)
+  const seconds =
+    Math.floor(time % 60)
 
   return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
 }
+
+/* =========================
+   Montage
+========================= */
 
 onMounted(() => {
   if (!audioElement.value) {
@@ -153,6 +200,11 @@ onMounted(() => {
 
   audioElement.value.addEventListener(
     'loadedmetadata',
+    setDuration
+  )
+
+  audioElement.value.addEventListener(
+    'durationchange',
     setDuration
   )
 
@@ -177,6 +229,10 @@ onMounted(() => {
   )
 })
 
+/* =========================
+   Nettoyage
+========================= */
+
 onBeforeUnmount(() => {
   if (!audioElement.value) {
     return
@@ -184,6 +240,11 @@ onBeforeUnmount(() => {
 
   audioElement.value.removeEventListener(
     'loadedmetadata',
+    setDuration
+  )
+
+  audioElement.value.removeEventListener(
+    'durationchange',
     setDuration
   )
 
@@ -212,11 +273,17 @@ onBeforeUnmount(() => {
 <template>
   <div class="audio-player">
 
-    <!-- En-tête -->
+    <!-- =========================
+         En-tête
+    ========================== -->
+
     <div class="audio-player-header">
 
       <div class="audio-player-icon">
-        <Mic2 :size="20" />
+        <Mic2
+          :size="20"
+          :stroke-width="2"
+        />
       </div>
 
       <div class="audio-player-info">
@@ -233,7 +300,10 @@ onBeforeUnmount(() => {
 
     </div>
 
-    <!-- Lecteur natif -->
+    <!-- =========================
+         Lecteur natif du navigateur
+    ========================== -->
+
     <audio
       ref="audioElement"
       class="native-audio"
@@ -241,10 +311,14 @@ onBeforeUnmount(() => {
       preload="metadata"
       :src="props.src"
     >
-      Votre navigateur ne prend pas en charge la lecture audio.
+      Votre navigateur ne prend pas en charge
+      la lecture audio.
     </audio>
 
-    <!-- Contrôles personnalisés -->
+    <!-- =========================
+         Contrôles TCHB
+    ========================== -->
+
     <div class="custom-controls">
 
       <!-- Reculer -->
@@ -273,18 +347,29 @@ onBeforeUnmount(() => {
       <button
         type="button"
         class="control-button play"
-        :aria-label="isPlaying ? 'Mettre en pause' : 'Lire'"
+        :aria-label="
+          isPlaying
+            ? 'Mettre en pause'
+            : 'Lire'
+        "
+        :title="
+          isPlaying
+            ? 'Mettre en pause'
+            : 'Lire'
+        "
         @click="togglePlay"
       >
         <Pause
           v-if="isPlaying"
           :size="22"
+          :stroke-width="2.5"
           fill="currentColor"
         />
 
         <Play
           v-else
           :size="22"
+          :stroke-width="2.5"
           fill="currentColor"
         />
       </button>
@@ -302,11 +387,21 @@ onBeforeUnmount(() => {
 
     </div>
 
-    <!-- Progression personnalisée -->
+    <!-- =========================
+         Progression TCHB
+    ========================== -->
+
     <div
       class="progress-container"
+      role="slider"
+      tabindex="0"
+      :aria-valuemin="0"
+      :aria-valuemax="duration || 0"
+      :aria-valuenow="currentTime"
+      aria-label="Progression de la lecture"
       @click="seek"
     >
+
       <div class="progress-bar">
 
         <div
@@ -319,7 +414,12 @@ onBeforeUnmount(() => {
         ></div>
 
       </div>
+
     </div>
+
+    <!-- =========================
+         Temps
+    ========================== -->
 
     <div class="time-container">
 
@@ -338,12 +438,22 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .audio-player {
+  width: 100%;
+  box-sizing: border-box;
+
   padding: 20px;
 
-  background: #ffffff;
+  background: var(--color-surface);
 
-  border: 1px solid #e9ecef;
+  border: 1px solid var(--color-border);
   border-radius: 14px;
+
+  color: var(--color-text);
+
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease,
+    color 0.25s ease;
 }
 
 /* =========================
@@ -370,8 +480,12 @@ onBeforeUnmount(() => {
 
   border-radius: 11px;
 
-  background: #111827;
-  color: #ffffff;
+  background: var(--color-text);
+  color: var(--color-surface);
+
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease;
 }
 
 .audio-player-info {
@@ -383,21 +497,27 @@ onBeforeUnmount(() => {
 }
 
 .audio-player-info span {
-  color: #9ca3af;
+  color: var(--color-text-muted);
 
   font-size: 11px;
+
+  transition:
+    color 0.25s ease;
 }
 
 .audio-player-info strong {
   overflow: hidden;
 
-  color: #111827;
+  color: var(--color-text);
 
   font-size: 14px;
   font-weight: 650;
 
   text-overflow: ellipsis;
   white-space: nowrap;
+
+  transition:
+    color 0.25s ease;
 }
 
 /* =========================
@@ -409,55 +529,19 @@ onBeforeUnmount(() => {
 
   width: 100%;
 
-  margin-bottom: 18px;
+  margin: 0 0 20px;
+
+  border-radius: 8px;
+
+  /*
+   * Permet au navigateur d'adapter
+   * ses contrôles au thème de l'application.
+   */
+  color-scheme: light dark;
 }
 
 /* =========================
-   Progression
-========================= */
-
-.progress-container {
-  width: 100%;
-
-  padding: 8px 0;
-
-  cursor: pointer;
-}
-
-.progress-bar {
-  width: 100%;
-  height: 5px;
-
-  overflow: hidden;
-
-  border-radius: 10px;
-
-  background: #e5e7eb;
-}
-
-.progress {
-  height: 100%;
-
-  border-radius: inherit;
-
-  background: #111827;
-
-  transition: width 0.1s linear;
-}
-
-.time-container {
-  display: flex;
-  justify-content: space-between;
-
-  margin-top: 3px;
-
-  color: #9ca3af;
-
-  font-size: 11px;
-}
-
-/* =========================
-   Contrôles
+   Contrôles personnalisés
 ========================= */
 
 .custom-controls {
@@ -467,7 +551,7 @@ onBeforeUnmount(() => {
 
   gap: 12px;
 
-  margin-bottom: 4px;
+  margin-bottom: 12px;
 }
 
 .control-button {
@@ -475,13 +559,16 @@ onBeforeUnmount(() => {
   align-items: center;
   justify-content: center;
 
+  padding: 0;
+
   border: none;
 
   cursor: pointer;
 
   transition:
     transform 0.15s ease,
-    background 0.2s ease;
+    background-color 0.2s ease,
+    color 0.2s ease;
 }
 
 .control-button:hover {
@@ -498,8 +585,18 @@ onBeforeUnmount(() => {
 
   border-radius: 50%;
 
-  background: #f1f3f5;
-  color: #6b7280;
+  background: var(--color-surface-secondary);
+  color: var(--color-text-secondary);
+
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease,
+    transform 0.15s ease;
+}
+
+.control-button.secondary:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-text);
 }
 
 .control-button.play {
@@ -508,7 +605,99 @@ onBeforeUnmount(() => {
 
   border-radius: 50%;
 
-  background: #111827;
-  color: #ffffff;
+  background: var(--color-text);
+  color: var(--color-surface);
+
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease,
+    transform 0.15s ease;
+}
+
+/* =========================
+   Progression
+========================= */
+
+.progress-container {
+  width: 100%;
+
+  padding: 8px 0;
+
+  cursor: pointer;
+
+  outline: none;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 5px;
+
+  overflow: hidden;
+
+  border-radius: 10px;
+
+  background: var(--color-surface-secondary);
+
+  transition:
+    background-color 0.25s ease;
+}
+
+.progress {
+  height: 100%;
+
+  border-radius: inherit;
+
+  background: var(--color-text);
+
+  transition:
+    background-color 0.25s ease,
+    width 0.1s linear;
+}
+
+/* =========================
+   Temps
+========================= */
+
+.time-container {
+  display: flex;
+  justify-content: space-between;
+
+  margin-top: 3px;
+
+  color: var(--color-text-muted);
+
+  font-size: 11px;
+
+  transition:
+    color 0.25s ease;
+}
+
+/* =========================
+   Mobile
+========================= */
+
+@media (max-width: 480px) {
+
+  .audio-player {
+    padding: 16px;
+  }
+
+  .audio-player-header {
+    margin-bottom: 16px;
+  }
+
+  .custom-controls {
+    gap: 10px;
+  }
+
+  .control-button.secondary {
+    width: 36px;
+    height: 36px;
+  }
+
+  .control-button.play {
+    width: 48px;
+    height: 48px;
+  }
 }
 </style>
