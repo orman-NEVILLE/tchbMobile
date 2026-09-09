@@ -1,11 +1,17 @@
 <script setup>
-import { ref } from 'vue'
+import {
+  onBeforeUnmount,
+  onMounted,
+  ref,
+} from 'vue'
 
 import NotificationButton from '@/components/NotificationButton.vue'
 import ProfileButton from '@/components/ProfileButton.vue'
 import ProfileMenu from '@/components/ProfileMenu.vue'
 
 const isProfileMenuOpen = ref(false)
+
+const profileWrapper = ref(null)
 
 const toggleProfileMenu = () => {
   isProfileMenuOpen.value = !isProfileMenuOpen.value
@@ -14,6 +20,29 @@ const toggleProfileMenu = () => {
 const closeProfileMenu = () => {
   isProfileMenuOpen.value = false
 }
+
+const handleClickOutside = (event) => {
+  if (
+    profileWrapper.value &&
+    !profileWrapper.value.contains(event.target)
+  ) {
+    closeProfileMenu()
+  }
+}
+
+onMounted(() => {
+  document.addEventListener(
+    'click',
+    handleClickOutside
+  )
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener(
+    'click',
+    handleClickOutside
+  )
+})
 </script>
 
 <template>
@@ -41,7 +70,10 @@ const closeProfileMenu = () => {
         <NotificationButton />
 
         <!-- Profil -->
-        <div class="profile-wrapper">
+        <div
+            ref="profileWrapper"
+            class="profile-wrapper"
+            >
 
           <ProfileButton
             @click="toggleProfileMenu"
