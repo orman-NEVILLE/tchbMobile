@@ -10,23 +10,23 @@ import {
 import AudioPlayer from '@/components/AudioPlayer.vue'
 import VideoPlayer from '@/components/VideoPlayer.vue'
 
-import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
+import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
 
-
 const preachings = [
-    {
+  {
     id: 1,
     title: 'La foi qui transforme',
     preacher: 'Pasteur Jean',
     date: '07 Septembre 2026',
     duration: '32:15',
-    description: '...',
+    description:
+      'Un enseignement sur la foi et son pouvoir de transformer notre manière de vivre, de penser et de marcher avec Dieu.',
     video: '/media/videos/predication-1.mp4',
     audio: '/media/audio/predication-1.mp3',
-    },
+  },
   {
     id: 2,
     title: 'Le chemin de la foi',
@@ -81,7 +81,10 @@ const preaching = computed(() => {
       class="back-link"
     >
       <ArrowLeft :size="18" />
-      <span>Retour aux prédications</span>
+
+      <span>
+        Retour aux prédications
+      </span>
     </RouterLink>
 
     <!-- Prédication trouvée -->
@@ -98,6 +101,7 @@ const preaching = computed(() => {
         </div>
 
         <div class="detail-title">
+
           <h1>
             {{ preaching.title }}
           </h1>
@@ -106,33 +110,30 @@ const preaching = computed(() => {
             Une prédication pour fortifier votre foi
             et votre marche avec Dieu.
           </p>
+
         </div>
 
       </section>
-        <video
-        ref="videoElement"
-        class="preaching-video"
-        controls
-        preload="metadata"
-        @click="handleVideoClick"
-        >
-        <source
-            :src="preaching.video"
-            type="video/mp4"
+
+      <!-- Vidéo -->
+      <section
+        v-if="preaching.video"
+        class="video-card"
+      >
+        <VideoPlayer
+          :src="preaching.video"
         />
+      </section>
 
-        Votre navigateur ne prend pas en charge la lecture vidéo.
-        </video>
-
-        <!-- Audio -->
-        <section class="audio-card">
-
-
+      <!-- Audio -->
+      <section
+        v-if="preaching.audio"
+        class="audio-card"
+      >
         <AudioPlayer
-            :src="preaching.audio"
+          :src="preaching.audio"
         />
-
-        </section>
+      </section>
 
       <!-- Informations -->
       <section class="info-card">
@@ -143,7 +144,9 @@ const preaching = computed(() => {
           <User :size="18" />
 
           <div>
-            <span>Prédicateur</span>
+            <span>
+              Prédicateur
+            </span>
 
             <strong>
               {{ preaching.preacher }}
@@ -158,7 +161,9 @@ const preaching = computed(() => {
           <CalendarDays :size="18" />
 
           <div>
-            <span>Date</span>
+            <span>
+              Date
+            </span>
 
             <strong>
               {{ preaching.date }}
@@ -173,7 +178,9 @@ const preaching = computed(() => {
           <Clock :size="18" />
 
           <div>
-            <span>Durée</span>
+            <span>
+              Durée
+            </span>
 
             <strong>
               {{ preaching.duration }}
@@ -234,6 +241,10 @@ const preaching = computed(() => {
   display: flex;
   flex-direction: column;
   gap: 24px;
+
+  color: var(--color-text);
+
+  transition: color 0.25s ease;
 }
 
 /* =========================
@@ -247,7 +258,8 @@ const preaching = computed(() => {
 
   width: fit-content;
 
-  color: #6b7280;
+  color: var(--color-text-secondary);
+
   text-decoration: none;
 
   font-size: 13px;
@@ -257,7 +269,7 @@ const preaching = computed(() => {
 }
 
 .back-link:hover {
-  color: #111827;
+  color: var(--color-text);
 }
 
 /* =========================
@@ -282,8 +294,12 @@ const preaching = computed(() => {
 
   border-radius: 14px;
 
-  background: #111827;
-  color: #ffffff;
+  background: var(--color-text);
+  color: var(--color-surface);
+
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease;
 }
 
 .detail-title {
@@ -293,23 +309,62 @@ const preaching = computed(() => {
 .detail-title h1 {
   margin: 0;
 
-  color: #111827;
+  color: var(--color-text);
 
   font-size: 24px;
   font-weight: 750;
   letter-spacing: -0.3px;
+
+  transition: color 0.25s ease;
 }
 
 .detail-title p {
   margin: 5px 0 0;
 
-  color: #6b7280;
+  color: var(--color-text-secondary);
 
   font-size: 13px;
   line-height: 1.5;
+
+  transition: color 0.25s ease;
 }
 
+/* =========================
+   Vidéo
+========================= */
 
+.video-card {
+  width: 100%;
+
+  overflow: hidden;
+
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease;
+}
+
+/* =========================
+   Audio
+========================= */
+
+.audio-card {
+  width: 100%;
+  box-sizing: border-box;
+
+  padding: 16px;
+
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease;
+}
 
 /* =========================
    Informations
@@ -322,9 +377,13 @@ const preaching = computed(() => {
 
   padding: 16px;
 
-  background: #ffffff;
-  border: 1px solid #e9ecef;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: 14px;
+
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease;
 }
 
 .info-item {
@@ -334,7 +393,9 @@ const preaching = computed(() => {
 
   min-width: 0;
 
-  color: #6b7280;
+  color: var(--color-text-secondary);
+
+  transition: color 0.25s ease;
 }
 
 .info-item svg {
@@ -350,16 +411,20 @@ const preaching = computed(() => {
 }
 
 .info-item span {
-  color: #9ca3af;
+  color: var(--color-text-muted);
 
   font-size: 11px;
+
+  transition: color 0.25s ease;
 }
 
 .info-item strong {
-  color: #111827;
+  color: var(--color-text);
 
   font-size: 13px;
   font-weight: 600;
+
+  transition: color 0.25s ease;
 }
 
 /* =========================
@@ -369,27 +434,35 @@ const preaching = computed(() => {
 .description-card {
   padding: 20px;
 
-  background: #ffffff;
-  border: 1px solid #e9ecef;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: 14px;
+
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease;
 }
 
 .description-card h2 {
   margin: 0 0 8px;
 
-  color: #111827;
+  color: var(--color-text);
 
   font-size: 16px;
   font-weight: 700;
+
+  transition: color 0.25s ease;
 }
 
 .description-card p {
   margin: 0;
 
-  color: #6b7280;
+  color: var(--color-text-secondary);
 
   font-size: 13px;
   line-height: 1.7;
+
+  transition: color 0.25s ease;
 }
 
 /* =========================
@@ -405,9 +478,13 @@ const preaching = computed(() => {
 
   text-align: center;
 
-  background: #ffffff;
-  border: 1px solid #e9ecef;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: 14px;
+
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease;
 }
 
 .not-found-icon {
@@ -422,17 +499,23 @@ const preaching = computed(() => {
 
   border-radius: 50%;
 
-  background: #f1f3f5;
-  color: #6b7280;
+  background: var(--color-surface-secondary);
+  color: var(--color-text-secondary);
+
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease;
 }
 
 .not-found h2 {
   margin: 0;
 
-  color: #111827;
+  color: var(--color-text);
 
   font-size: 17px;
   font-weight: 700;
+
+  transition: color 0.25s ease;
 }
 
 .not-found p {
@@ -440,10 +523,12 @@ const preaching = computed(() => {
 
   margin: 7px 0 18px;
 
-  color: #9ca3af;
+  color: var(--color-text-muted);
 
   font-size: 13px;
   line-height: 1.5;
+
+  transition: color 0.25s ease;
 }
 
 .back-to-list {
@@ -457,19 +542,21 @@ const preaching = computed(() => {
 
   border-radius: 10px;
 
-  background: #111827;
-  color: #ffffff;
+  background: var(--color-text);
+  color: var(--color-surface);
 
   text-decoration: none;
 
   font-size: 13px;
   font-weight: 600;
 
-  transition: background 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
 }
 
 .back-to-list:hover {
-  background: #374151;
+  background: var(--color-text-secondary);
 }
 
 /* =========================
@@ -477,6 +564,21 @@ const preaching = computed(() => {
 ========================= */
 
 @media (max-width: 600px) {
+
+  .detail-page {
+    gap: 20px;
+  }
+
+  .detail-header {
+    gap: 12px;
+  }
+
+  .detail-icon {
+    width: 52px;
+    height: 52px;
+
+    border-radius: 13px;
+  }
 
   .detail-title h1 {
     font-size: 21px;
@@ -492,6 +594,10 @@ const preaching = computed(() => {
 
   .info-item {
     padding: 4px 0;
+  }
+
+  .description-card {
+    padding: 16px;
   }
 }
 </style>
