@@ -39,5 +39,5 @@ __screenshots__/
 *.timestamp-*-*.mjs
 
 # Médias lourds
-/public/media/videos/
-/public/media/audio/
+/public/media/videos/predication-1.mp4
+/public/media/audio/predication-1.mp3
