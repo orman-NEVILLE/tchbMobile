@@ -8,29 +8,63 @@ import {
 } from 'lucide-vue-next'
 
 import { ref } from 'vue'
+import { submitRequest } from '@/functions/accountRequest'
 
 const fullName = ref('')
 const whatsapp = ref('')
 const isSubmitting = ref(false)
 const showSuccessModal = ref(false)
 
-const submitRequest = async () => {
-  if (!fullName.value.trim() || !whatsapp.value.trim()) {
+const errorMessage = ref('')
+const successMessage = ref('')
+
+const submitForm = async () => {
+  errorMessage.value = ''
+
+  if (!fullName.value.trim()) {
+    errorMessage.value =
+      'Veuillez renseigner votre nom complet.'
+
+    return
+  }
+
+  if (!whatsapp.value.trim()) {
+    errorMessage.value =
+      'Veuillez renseigner votre numéro WhatsApp.'
+
+    return
+  }
+
+  if (isSubmitting.value) {
     return
   }
 
   isSubmitting.value = true
 
-  // Simulation de l'envoi
-  await new Promise((resolve) => {
-    setTimeout(resolve, 800)
-  })
+  try {
+    const response = await submitAccountRequest({
+      name: name.value.trim(),
+      phone_number: phone_number.value.trim(),
+    })
 
-  isSubmitting.value = false
-  showSuccessModal.value = true
+    successMessage.value = response.message
 
-  fullName.value = ''
-  whatsapp.value = ''
+    fullName.value = ''
+    whatsapp.value = ''
+
+    showSuccessModal.value = true
+  } catch (error) {
+    console.error(
+      'Erreur lors de l’envoi de la demande :',
+      error
+    )
+
+    errorMessage.value =
+      error.message ||
+      'Impossible d’envoyer votre demande. Veuillez réessayer.'
+  } finally {
+    isSubmitting.value = false
+  }
 }
 
 const closeSuccessModal = () => {
@@ -79,7 +113,7 @@ const closeSuccessModal = () => {
     <!-- Formulaire -->
     <form
       class="register-form"
-      @submit.prevent="submitRequest"
+      @submit.prevent="submitForm"
     >
 
       <!-- Nom complet -->
@@ -137,6 +171,14 @@ const closeSuccessModal = () => {
 
       </div>
 
+      <!-- Message d'erreur -->
+      <div
+        v-if="errorMessage"
+        class="error-message"
+      >
+        {{ errorMessage }}
+      </div>
+
       <!-- Bouton -->
       <button
         type="submit"
@@ -158,7 +200,7 @@ const closeSuccessModal = () => {
           {{
             isSubmitting
               ? 'Envoi en cours...'
-              : 'Envoyer la demande'
+              : 'Envoyer ma demande'
           }}
         </span>
       </button>
@@ -176,10 +218,7 @@ const closeSuccessModal = () => {
       </p>
     </div>
 
-    <!-- =========================
-         Popup de succès
-    ========================== -->
-
+    <!-- Popup de succès -->
     <div
       v-if="showSuccessModal"
       class="modal-overlay"
@@ -199,9 +238,7 @@ const closeSuccessModal = () => {
         </h2>
 
         <p>
-          Votre demande a été envoyée avec succès.
-          Vous recevrez un message contenant vos
-          identifiants de connexion.
+          {{ successMessage }}
         </p>
 
         <button
