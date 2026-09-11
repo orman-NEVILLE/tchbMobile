@@ -1,45 +1,71 @@
 import { computed, ref } from 'vue'
 
-const STORAGE_KEY = 'tchb-auth-user'
+const USER_STORAGE_KEY = 'tchb-auth-user'
+const TOKEN_STORAGE_KEY = 'tchb-auth-token'
 
-const storedUser = localStorage.getItem(STORAGE_KEY)
+const getStoredUser = () => {
+  const storedUser = localStorage.getItem(USER_STORAGE_KEY)
 
-const user = ref(
-  storedUser
-    ? JSON.parse(storedUser)
-    : null
+  if (!storedUser) {
+    return null
+  }
+
+  try {
+    return JSON.parse(storedUser)
+  } catch (error) {
+    console.error(
+      'Impossible de récupérer la session TCHB :',
+      error
+    )
+
+    localStorage.removeItem(USER_STORAGE_KEY)
+
+    return null
+  }
+}
+
+const user = ref(getStoredUser())
+
+const token = ref(
+  localStorage.getItem(TOKEN_STORAGE_KEY)
 )
 
 const isAuthenticated = computed(() => {
-  return user.value !== null
+  return !!token.value && user.value !== null
 })
 
-const login = (credentials) => {
-  const authenticatedUser = {
-    id: 1,
-    name: 'Jean Dupont',
-    whatsapp: credentials.whatsapp,
-  }
-
+const setSession = ({
+  user: authenticatedUser,
+  token: authToken,
+}) => {
   user.value = authenticatedUser
+  token.value = authToken
 
   localStorage.setItem(
-    STORAGE_KEY,
+    USER_STORAGE_KEY,
     JSON.stringify(authenticatedUser)
+  )
+
+  localStorage.setItem(
+    TOKEN_STORAGE_KEY,
+    authToken
   )
 }
 
 const logout = () => {
   user.value = null
+  token.value = null
 
-  localStorage.removeItem(STORAGE_KEY)
+  localStorage.removeItem(USER_STORAGE_KEY)
+  localStorage.removeItem(TOKEN_STORAGE_KEY)
 }
 
 export const useAuth = () => {
   return {
     user,
+    token,
     isAuthenticated,
-    login,
+    setSession,
     logout,
   }
 }

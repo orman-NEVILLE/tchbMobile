@@ -8,10 +8,10 @@ import {
 } from 'lucide-vue-next'
 
 import { ref } from 'vue'
-import { submitRequest } from '@/functions/accountRequest'
+import { submitAccountRequest } from '@/functions/accountRequest'
 
-const fullName = ref('')
-const whatsapp = ref('')
+const name = ref('')
+const phone_number = ref('')
 const isSubmitting = ref(false)
 const showSuccessModal = ref(false)
 
@@ -21,14 +21,14 @@ const successMessage = ref('')
 const submitForm = async () => {
   errorMessage.value = ''
 
-  if (!fullName.value.trim()) {
+  if (!name.value.trim()) {
     errorMessage.value =
       'Veuillez renseigner votre nom complet.'
 
     return
   }
 
-  if (!whatsapp.value.trim()) {
+  if (!phone_number.value.trim()) {
     errorMessage.value =
       'Veuillez renseigner votre numéro WhatsApp.'
 
@@ -49,8 +49,8 @@ const submitForm = async () => {
 
     successMessage.value = response.message
 
-    fullName.value = ''
-    whatsapp.value = ''
+    name.value = ''
+    phone_number.value = ''
 
     showSuccessModal.value = true
   } catch (error) {
@@ -130,8 +130,8 @@ const closeSuccessModal = () => {
           />
 
           <input
-            id="fullName"
-            v-model="fullName"
+            id="name"
+            v-model="name"
             type="text"
             placeholder="Ex. Jean Dupont"
             autocomplete="name"
@@ -141,7 +141,7 @@ const closeSuccessModal = () => {
 
       </div>
 
-      <!-- WhatsApp -->
+      <!-- phone_number -->
       <div class="form-group">
 
         <label for="whatsapp">
@@ -155,8 +155,8 @@ const closeSuccessModal = () => {
           />
 
           <input
-            id="whatsapp"
-            v-model="whatsapp"
+            id="phone_number"
+            v-model="phone_number"
             type="tel"
             placeholder="Ex. +243 81 234 56 78"
             autocomplete="tel"

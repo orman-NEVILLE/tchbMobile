@@ -14,15 +14,16 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 import { useAuth } from '@/composables/useAuth'
+import { login as loginRequest } from '@/functions/auth'
 
 const router = useRouter()
 
 const {
   isAuthenticated,
-  login,
+  setSession,
 } = useAuth()
 
-const whatsapp = ref('')
+const phone_number = ref('')
 const password = ref('')
 
 const showPassword = ref(false)
@@ -32,9 +33,9 @@ const errorMessage = ref('')
 const submitLogin = async () => {
   errorMessage.value = ''
 
-  if (!whatsapp.value.trim()) {
+  if (!phone_number.value.trim()) {
     errorMessage.value =
-      'Veuillez renseigner votre numéro WhatsApp.'
+      'Veuillez renseigner votre numéro de téléphone.'
 
     return
   }
@@ -53,13 +54,14 @@ const submitLogin = async () => {
   isSubmitting.value = true
 
   try {
-    // Simulation temporaire de l'appel API
-    await new Promise((resolve) => {
-      setTimeout(resolve, 800)
+    const response = await loginRequest({
+      phone_number: phone_number.value.trim(),
+      password: password.value,
     })
 
-    login({
-      whatsapp: whatsapp.value.trim(),
+    setSession({
+      user: response.user,
+      token: response.token,
     })
 
     router.push('/')
@@ -70,6 +72,7 @@ const submitLogin = async () => {
     )
 
     errorMessage.value =
+      error.message ||
       'Une erreur est survenue. Veuillez réessayer.'
   } finally {
     isSubmitting.value = false
@@ -160,10 +163,10 @@ const goToRegister = () => {
         @submit.prevent="submitLogin"
       >
 
-        <!-- WhatsApp -->
+        <!-- Numéro de téléphone -->
         <div class="form-group">
-          <label for="whatsapp">
-            Numéro WhatsApp
+          <label for="phone_number">
+            Numéro de téléphone
           </label>
 
           <div class="input-wrapper">
@@ -173,8 +176,8 @@ const goToRegister = () => {
             />
 
             <input
-              id="whatsapp"
-              v-model="whatsapp"
+              id="phone_number"
+              v-model="phone_number"
               type="tel"
               inputmode="tel"
               placeholder="+243 81 234 56 78"
