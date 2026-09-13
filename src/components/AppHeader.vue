@@ -55,9 +55,11 @@ onBeforeUnmount(() => {
         class="brand"
         aria-label="Accueil TCHB"
       >
-        <div class="brand-logo">
-          T
-        </div>
+        <img
+          src="/icons/logo-tchb.png"
+          alt="Logo TCHB"
+          class="brand-logo"
+        />
 
         <span class="brand-name">
           TCHB
@@ -137,17 +139,10 @@ onBeforeUnmount(() => {
   width: 36px;
   height: 36px;
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: block;
 
+  object-fit: contain;
   border-radius: 10px;
-
-  background: var(--color-text);
-  color: var(--color-surface);
-
-  font-size: 16px;
-  font-weight: 750;
 }
 
 .brand-name {
