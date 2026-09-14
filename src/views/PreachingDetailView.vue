@@ -2,10 +2,10 @@
 import {
   ArrowLeft,
   CalendarDays,
-  Clock,
+  Headphones,
   LoaderCircle,
-  Mic2,
   User,
+  Video,
 } from 'lucide-vue-next'
 
 import {
@@ -45,12 +45,7 @@ const loadPreaching = async () => {
 
     const response = await getSermon(id)
 
-    console.log('Réponse API :', response)
-
     preaching.value = response.data
-
-    console.log('Prédication :', preaching.value)
-    console.log('Médias :', preaching.value?.media)
 
   } catch (error) {
     console.error(
@@ -115,16 +110,23 @@ const formattedDate = computed(() => {
 
 
 /* =========================
-   DURÉE
+   TYPE DE MÉDIA
 ========================= */
 
-const duration = computed(() => {
-  return (
-    audioMedia.value?.duration ||
-    videoMedia.value?.duration ||
-    preaching.value?.duration ||
-    null
-  )
+const mediaLabel = computed(() => {
+  if (videoMedia.value && audioMedia.value) {
+    return 'Audio et vidéo'
+  }
+
+  if (videoMedia.value) {
+    return 'Vidéo'
+  }
+
+  if (audioMedia.value) {
+    return 'Audio'
+  }
+
+  return null
 })
 
 
@@ -134,59 +136,52 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="detail-page">
+  <main class="detail-page">
 
-    <!-- =========================
-         RETOUR
-    ========================== -->
+    <!-- RETOUR -->
 
     <RouterLink
       to="/predications"
       class="back-link"
     >
-      <ArrowLeft :size="18" />
+      <ArrowLeft
+        :size="17"
+        :stroke-width="1.8"
+      />
 
       <span>
-        Retour aux prédications
+        Prédications
       </span>
     </RouterLink>
 
 
-    <!-- =========================
-         CHARGEMENT
-    ========================== -->
+    <!-- CHARGEMENT -->
 
     <section
       v-if="isLoading"
       class="loading-state"
     >
       <LoaderCircle
-        :size="26"
+        :size="25"
         class="loading-icon"
+        :stroke-width="1.7"
       />
 
       <span>
-        Chargement de la prédication...
+        Chargement...
       </span>
     </section>
 
 
-    <!-- =========================
-         ERREUR / INTRouvable
-    ========================== -->
+    <!-- ERREUR -->
 
     <section
       v-else-if="errorMessage"
       class="not-found"
     >
-
-      <div class="not-found-icon">
-        <Mic2 :size="24" />
-      </div>
-
-      <h2>
+      <h1>
         Prédication introuvable
-      </h2>
+      </h1>
 
       <p>
         {{ errorMessage }}
@@ -194,17 +189,14 @@ onMounted(() => {
 
       <RouterLink
         to="/predications"
-        class="back-to-list"
+        class="back-button"
       >
-        Voir les prédications
+        Retour aux prédications
       </RouterLink>
-
     </section>
 
 
-    <!-- =========================
-         PRÉDICATION
-    ========================== -->
+    <!-- CONTENU -->
 
     <template v-else-if="preaching">
 
@@ -212,31 +204,43 @@ onMounted(() => {
            EN-TÊTE
       ========================== -->
 
-      <section class="detail-header">
+      <header class="sermon-header">
 
-        <div class="detail-icon">
-          <Mic2
-            :size="28"
-            :stroke-width="2"
-          />
+        <div class="category">
+          {{ preaching.category?.name || 'Prédication' }}
         </div>
 
-        <div class="detail-title">
+        <h1 class="title">
+          {{ preaching.title }}
+        </h1>
 
-          <h1>
-            {{ preaching.title }}
-          </h1>
+        <div class="header-meta">
 
-          <p>
-            {{
-              preaching.description ||
-              'Une prédication pour fortifier votre foi et votre marche avec Dieu.'
-            }}
-          </p>
+          <span>
+            <User
+              :size="15"
+              :stroke-width="1.8"
+            />
+
+            {{ preaching.preacher_name }}
+          </span>
+
+          <span class="separator">
+            ·
+          </span>
+
+          <span>
+            <CalendarDays
+              :size="15"
+              :stroke-width="1.8"
+            />
+
+            {{ formattedDate }}
+          </span>
 
         </div>
 
-      </section>
+      </header>
 
 
       <!-- =========================
@@ -245,7 +249,7 @@ onMounted(() => {
 
       <section
         v-if="videoMedia"
-        class="video-card"
+        class="video-section"
       >
         <VideoPlayer
           :src="videoMedia.url"
@@ -259,8 +263,23 @@ onMounted(() => {
 
       <section
         v-if="audioMedia"
-        class="audio-card"
+        class="audio-section"
       >
+        <div class="section-label">
+
+          <div class="section-label-icon">
+            <Headphones
+              :size="16"
+              :stroke-width="1.8"
+            />
+          </div>
+
+          <span>
+            Écouter la prédication
+          </span>
+
+        </div>
+
         <AudioPlayer
           :src="audioMedia.url"
         />
@@ -271,16 +290,16 @@ onMounted(() => {
            INFORMATIONS
       ========================== -->
 
-      <section class="info-card">
+      <div class="sermon-meta">
 
-        <!-- Prédicateur -->
+        <div class="meta-item">
 
-        <div class="info-item">
-
-          <User :size="18" />
+          <User
+            :size="17"
+            :stroke-width="1.7"
+          />
 
           <div>
-
             <span>
               Prédicateur
             </span>
@@ -288,20 +307,19 @@ onMounted(() => {
             <strong>
               {{ preaching.preacher_name }}
             </strong>
-
           </div>
 
         </div>
 
 
-        <!-- Date -->
+        <div class="meta-item">
 
-        <div class="info-item">
-
-          <CalendarDays :size="18" />
+          <CalendarDays
+            :size="17"
+            :stroke-width="1.7"
+          />
 
           <div>
-
             <span>
               Date
             </span>
@@ -309,36 +327,41 @@ onMounted(() => {
             <strong>
               {{ formattedDate }}
             </strong>
-
           </div>
 
         </div>
 
 
-        <!-- Durée -->
-
         <div
-          v-if="duration"
-          class="info-item"
+          v-if="mediaLabel"
+          class="meta-item"
         >
 
-          <Clock :size="18" />
+          <Video
+            v-if="videoMedia"
+            :size="17"
+            :stroke-width="1.7"
+          />
+
+          <Headphones
+            v-else
+            :size="17"
+            :stroke-width="1.7"
+          />
 
           <div>
-
             <span>
-              Durée
+              Disponible en
             </span>
 
             <strong>
-              {{ duration }}
+              {{ mediaLabel }}
             </strong>
-
           </div>
 
         </div>
 
-      </section>
+      </div>
 
 
       <!-- =========================
@@ -347,11 +370,11 @@ onMounted(() => {
 
       <section
         v-if="preaching.description"
-        class="description-card"
+        class="description-section"
       >
 
         <h2>
-          À propos de cette prédication
+          À propos
         </h2>
 
         <p>
@@ -362,23 +385,31 @@ onMounted(() => {
 
     </template>
 
-  </div>
+  </main>
 </template>
 
 <style scoped>
+/* =========================
+   PAGE
+========================= */
+
 .detail-page {
+  width: 100%;
+  max-width: 760px;
+
+  margin: 0 auto;
+
   display: flex;
   flex-direction: column;
-  gap: 24px;
+
+  gap: 28px;
 
   color: var(--color-text);
-
-  transition: color 0.25s ease;
 }
 
 
 /* =========================
-   Retour
+   RETOUR
 ========================= */
 
 .back-link {
@@ -388,30 +419,254 @@ onMounted(() => {
 
   width: fit-content;
 
-  color: var(--color-text-secondary);
+  color: var(--color-text-muted);
 
   text-decoration: none;
 
-  font-size: 13px;
-  font-weight: 500;
+  font-size: 12px;
+  font-weight: 550;
 
-  transition: color 0.2s ease;
+  transition:
+    color 0.2s ease,
+    transform 0.2s ease;
 }
 
 .back-link:hover {
   color: var(--color-text);
+
+  transform: translateX(-2px);
 }
 
 
 /* =========================
-   Chargement
+   EN-TÊTE
+========================= */
+
+.sermon-header {
+  display: flex;
+  flex-direction: column;
+
+  gap: 9px;
+
+  padding-bottom: 4px;
+}
+
+.category {
+  width: fit-content;
+
+  color: var(--color-text-muted);
+
+  font-size: 10px;
+  font-weight: 700;
+
+  letter-spacing: 1px;
+
+  text-transform: uppercase;
+}
+
+.title {
+  max-width: 700px;
+
+  margin: 0;
+
+  color: var(--color-text);
+
+  font-size: 30px;
+  line-height: 1.2;
+
+  font-weight: 760;
+
+  letter-spacing: -0.7px;
+}
+
+.header-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+
+  gap: 9px;
+
+  margin-top: 3px;
+
+  color: var(--color-text-secondary);
+
+  font-size: 12px;
+}
+
+.header-meta span {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 5px;
+}
+
+.header-meta .separator {
+  color: var(--color-text-muted);
+
+  font-size: 15px;
+}
+
+
+/* =========================
+   VIDÉO
+========================= */
+
+.video-section {
+  width: 100%;
+
+  overflow: hidden;
+
+  border-radius: 14px;
+
+  background: #000;
+}
+
+
+/* =========================
+   AUDIO
+========================= */
+
+.audio-section {
+  display: flex;
+  flex-direction: column;
+
+  gap: 12px;
+
+  padding: 16px 0;
+
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.section-label {
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+
+  color: var(--color-text-secondary);
+
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.section-label-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: var(--color-text-muted);
+}
+
+
+/* =========================
+   INFORMATIONS
+========================= */
+
+.sermon-meta {
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+
+  gap: 9px;
+
+  min-width: 0;
+
+  padding: 15px 16px;
+
+  color: var(--color-text-muted);
+}
+
+.meta-item + .meta-item {
+  border-left: 1px solid var(--color-border);
+}
+
+.meta-item > div {
+  display: flex;
+  flex-direction: column;
+
+  min-width: 0;
+
+  gap: 3px;
+}
+
+.meta-item span {
+  color: var(--color-text-muted);
+
+  font-size: 9px;
+
+  font-weight: 600;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.5px;
+}
+
+.meta-item strong {
+  overflow: hidden;
+
+  color: var(--color-text);
+
+  font-size: 11px;
+
+  font-weight: 600;
+
+  white-space: nowrap;
+
+  text-overflow: ellipsis;
+}
+
+
+/* =========================
+   DESCRIPTION
+========================= */
+
+.description-section {
+  max-width: 680px;
+
+  padding-bottom: 20px;
+}
+
+.description-section h2 {
+  margin: 0 0 9px;
+
+  color: var(--color-text);
+
+  font-size: 15px;
+
+  font-weight: 700;
+}
+
+.description-section p {
+  margin: 0;
+
+  color: var(--color-text-secondary);
+
+  font-size: 13px;
+
+  line-height: 1.75;
+}
+
+
+/* =========================
+   CHARGEMENT
 ========================= */
 
 .loading-state {
-  min-height: 220px;
+  min-height: 300px;
 
   display: flex;
   flex-direction: column;
+
   align-items: center;
   justify-content: center;
 
@@ -419,7 +674,7 @@ onMounted(() => {
 
   color: var(--color-text-muted);
 
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .loading-icon {
@@ -438,346 +693,107 @@ onMounted(() => {
 
 
 /* =========================
-   En-tête
-========================= */
-
-.detail-header {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
-.detail-icon {
-  width: 58px;
-  height: 58px;
-
-  flex-shrink: 0;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  border-radius: 14px;
-
-  background: var(--color-text);
-  color: var(--color-surface);
-
-  transition:
-    background-color 0.25s ease,
-    color 0.25s ease;
-}
-
-.detail-title {
-  min-width: 0;
-}
-
-.detail-title h1 {
-  margin: 0;
-
-  color: var(--color-text);
-
-  font-size: 24px;
-  font-weight: 750;
-  letter-spacing: -0.3px;
-
-  transition: color 0.25s ease;
-}
-
-.detail-title p {
-  margin: 5px 0 0;
-
-  color: var(--color-text-secondary);
-
-  font-size: 13px;
-  line-height: 1.5;
-
-  transition: color 0.25s ease;
-}
-
-
-/* =========================
-   Vidéo
-========================= */
-
-.video-card {
-  width: 100%;
-
-  overflow: hidden;
-
-  background: var(--color-surface);
-
-  border: 1px solid var(--color-border);
-  border-radius: 14px;
-
-  transition:
-    background-color 0.25s ease,
-    border-color 0.25s ease;
-}
-
-
-/* =========================
-   Audio
-========================= */
-
-.audio-card {
-  width: 100%;
-  box-sizing: border-box;
-
-  padding: 16px;
-
-  background: var(--color-surface);
-
-  border: 1px solid var(--color-border);
-  border-radius: 14px;
-
-  transition:
-    background-color 0.25s ease,
-    border-color 0.25s ease;
-}
-
-
-/* =========================
-   Informations
-========================= */
-
-.info-card {
-  display: grid;
-
-  grid-template-columns: repeat(3, 1fr);
-
-  gap: 12px;
-
-  padding: 16px;
-
-  background: var(--color-surface);
-
-  border: 1px solid var(--color-border);
-  border-radius: 14px;
-
-  transition:
-    background-color 0.25s ease,
-    border-color 0.25s ease;
-}
-
-.info-item {
-  display: flex;
-  align-items: center;
-
-  gap: 10px;
-
-  min-width: 0;
-
-  color: var(--color-text-secondary);
-
-  transition: color 0.25s ease;
-}
-
-.info-item svg {
-  flex-shrink: 0;
-}
-
-.info-item div {
-  display: flex;
-  flex-direction: column;
-
-  gap: 3px;
-
-  min-width: 0;
-}
-
-.info-item span {
-  color: var(--color-text-muted);
-
-  font-size: 11px;
-
-  transition: color 0.25s ease;
-}
-
-.info-item strong {
-  color: var(--color-text);
-
-  font-size: 13px;
-  font-weight: 600;
-
-  transition: color 0.25s ease;
-}
-
-
-/* =========================
-   Description
-========================= */
-
-.description-card {
-  padding: 20px;
-
-  background: var(--color-surface);
-
-  border: 1px solid var(--color-border);
-  border-radius: 14px;
-
-  transition:
-    background-color 0.25s ease,
-    border-color 0.25s ease;
-}
-
-.description-card h2 {
-  margin: 0 0 8px;
-
-  color: var(--color-text);
-
-  font-size: 16px;
-  font-weight: 700;
-
-  transition: color 0.25s ease;
-}
-
-.description-card p {
-  margin: 0;
-
-  color: var(--color-text-secondary);
-
-  font-size: 13px;
-  line-height: 1.7;
-
-  transition: color 0.25s ease;
-}
-
-
-/* =========================
-   Introuvable
+   ERREUR
 ========================= */
 
 .not-found {
+  min-height: 280px;
+
   display: flex;
   flex-direction: column;
-  align-items: center;
 
-  padding: 40px 20px;
-
-  text-align: center;
-
-  background: var(--color-surface);
-
-  border: 1px solid var(--color-border);
-  border-radius: 14px;
-
-  transition:
-    background-color 0.25s ease,
-    border-color 0.25s ease;
-}
-
-.not-found-icon {
-  width: 48px;
-  height: 48px;
-
-  display: flex;
   align-items: center;
   justify-content: center;
 
-  margin-bottom: 14px;
+  padding: 30px;
 
-  border-radius: 50%;
-
-  background: var(--color-surface-secondary);
-  color: var(--color-text-secondary);
-
-  transition:
-    background-color 0.25s ease,
-    color 0.25s ease;
+  text-align: center;
 }
 
-.not-found h2 {
+.not-found h1 {
   margin: 0;
 
   color: var(--color-text);
 
-  font-size: 17px;
+  font-size: 20px;
   font-weight: 700;
-
-  transition: color 0.25s ease;
 }
 
 .not-found p {
-  max-width: 340px;
+  max-width: 400px;
 
-  margin: 7px 0 18px;
+  margin: 8px 0 20px;
 
-  color: var(--color-text-muted);
+  color: var(--color-text-secondary);
 
   font-size: 13px;
-  line-height: 1.5;
 
-  transition: color 0.25s ease;
+  line-height: 1.6;
 }
 
-.back-to-list {
+.back-button {
   display: inline-flex;
+
   align-items: center;
   justify-content: center;
 
-  min-height: 40px;
+  min-height: 38px;
 
-  padding: 0 16px;
+  padding: 0 15px;
 
-  border-radius: 10px;
+  border-radius: 9px;
 
   background: var(--color-text);
   color: var(--color-surface);
 
   text-decoration: none;
 
-  font-size: 13px;
-  font-weight: 600;
-
-  transition:
-    background-color 0.2s ease,
-    color 0.2s ease;
-}
-
-.back-to-list:hover {
-  background: var(--color-text-secondary);
+  font-size: 12px;
+  font-weight: 650;
 }
 
 
 /* =========================
-   Mobile
+   MOBILE
 ========================= */
 
 @media (max-width: 600px) {
 
   .detail-page {
-    gap: 20px;
+    gap: 22px;
   }
 
-  .detail-header {
-    gap: 12px;
+  .title {
+    font-size: 23px;
+
+    letter-spacing: -0.4px;
   }
 
-  .detail-icon {
-    width: 52px;
-    height: 52px;
+  .header-meta {
+    gap: 7px;
 
-    border-radius: 13px;
+    font-size: 11px;
   }
 
-  .detail-title h1 {
-    font-size: 21px;
-  }
-
-  .detail-title p {
-    font-size: 12px;
-  }
-
-  .info-card {
+  .sermon-meta {
     grid-template-columns: 1fr;
   }
 
-  .info-item {
-    padding: 4px 0;
+  .meta-item {
+    padding: 13px 0;
   }
 
-  .description-card {
-    padding: 16px;
+  .meta-item + .meta-item {
+    border-top: 1px solid var(--color-border);
+    border-left: 0;
+  }
+
+  .description-section {
+    padding-bottom: 10px;
+  }
+
+  .description-section p {
+    font-size: 12px;
   }
 }
 </style>

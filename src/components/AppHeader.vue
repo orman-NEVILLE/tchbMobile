@@ -1,16 +1,39 @@
 <script setup>
 import {
+  computed,
   onBeforeUnmount,
   onMounted,
   ref,
 } from 'vue'
 
+import { useRoute } from 'vue-router'
+
 import NotificationButton from '@/components/NotificationButton.vue'
 import ProfileButton from '@/components/ProfileButton.vue'
 import ProfileMenu from '@/components/ProfileMenu.vue'
 
-const isProfileMenuOpen = ref(false)
+const route = useRoute()
 
+const pageTitle = computed(() => {
+  switch (route.name) {
+    case 'home':
+      return 'Accueil'
+
+    case 'preachings':
+      return 'Prédications'
+
+    case 'preaching-detail':
+      return 'Prédication'
+
+    case 'profile':
+      return 'Mon profil'
+
+    default:
+      return 'TCHB'
+  }
+})
+
+const isProfileMenuOpen = ref(false)
 const profileWrapper = ref(null)
 
 const toggleProfileMenu = () => {
@@ -31,17 +54,11 @@ const handleClickOutside = (event) => {
 }
 
 onMounted(() => {
-  document.addEventListener(
-    'click',
-    handleClickOutside
-  )
+  document.addEventListener('click', handleClickOutside)
 })
 
 onBeforeUnmount(() => {
-  document.removeEventListener(
-    'click',
-    handleClickOutside
-  )
+  document.removeEventListener('click', handleClickOutside)
 })
 </script>
 
@@ -49,22 +66,21 @@ onBeforeUnmount(() => {
   <header class="app-header">
     <div class="header-content">
 
-      <!-- Logo -->
-      <RouterLink
-        to="/"
-        class="brand"
-        aria-label="Accueil TCHB"
-      >
-        <img
-          src="/icons/logo-tchb.png"
-          alt="Logo TCHB"
-          class="brand-logo"
-        />
+    <RouterLink
+      to="/"
+      class="brand"
+      aria-label="Accueil TCHB"
+    >
+      <img
+        src="/icons/logo-tchb.png"
+        alt="Logo TCHB"
+        class="brand-logo"
+      />
 
-        <span class="brand-name">
-          TCHB
-        </span>
-      </RouterLink>
+      <span class="brand-name">
+        {{ pageTitle }}
+      </span>
+    </RouterLink>
 
       <!-- Actions -->
       <div class="header-actions">
