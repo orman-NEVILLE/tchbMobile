@@ -1,60 +1,71 @@
 <script setup>
-import { Search, Mic2 } from 'lucide-vue-next'
-import { computed, ref } from 'vue'
+import {
+  LoaderCircle,
+  Mic2,
+  Search,
+} from 'lucide-vue-next'
+
+import {
+  computed,
+  onMounted,
+  ref,
+} from 'vue'
 
 import PreachingCard from '@/components/PreachingCard.vue'
+import { getSermons } from '@/functions/sermons'
 
 const search = ref('')
 
-const preachings = [
-  {
-    id: 1,
-    title: 'La foi qui transforme',
-    preacher: 'Pasteur Jean',
-    date: '07 Septembre 2026',
-    duration: '32:15',
-  },
-  {
-    id: 2,
-    title: 'Le chemin de la foi',
-    preacher: 'Pasteur David',
-    date: '05 Septembre 2026',
-    duration: '41:20',
-  },
-  {
-    id: 3,
-    title: 'Marcher dans la lumière',
-    preacher: 'Pasteur Jean',
-    date: '01 Septembre 2026',
-    duration: '36:42',
-  },
-  {
-    id: 4,
-    title: 'Une foi persévérante',
-    preacher: 'Pasteur David',
-    date: '28 Août 2026',
-    duration: '29:18',
-  },
-  {
-    id: 5,
-    title: 'La puissance de la Parole',
-    preacher: 'Pasteur Michel',
-    date: '24 Août 2026',
-    duration: '44:07',
-  },
-]
+const preachings = ref([])
+
+const isLoading = ref(true)
+const errorMessage = ref('')
+
+const loadPreachings = async () => {
+  isLoading.value = true
+  errorMessage.value = ''
+
+  try {
+    const response = await getSermons()
+
+    preachings.value = response.data || []
+  } catch (error) {
+    console.error(
+      'Erreur lors du chargement des prédications :',
+      error
+    )
+
+    errorMessage.value =
+      error.message ||
+      'Impossible de charger les prédications.'
+  } finally {
+    isLoading.value = false
+  }
+}
 
 const filteredPreachings = computed(() => {
   const query = search.value.trim().toLowerCase()
 
   if (!query) {
-    return preachings
+    return preachings.value
   }
 
-  return preachings.filter((preaching) =>
-    preaching.title.toLowerCase().includes(query) ||
-    preaching.preacher.toLowerCase().includes(query)
-  )
+  return preachings.value.filter((preaching) => {
+    const title =
+      preaching.title?.toLowerCase() || ''
+
+    const preacher =
+      preaching.preacher_name?.toLowerCase() || ''
+
+    return (
+      title.includes(query) ||
+      preacher.includes(query)
+    )
+  })
+})
+
+onMounted(() => {
+  loadPreachings()
 })
 </script>
 
@@ -118,7 +129,11 @@ const filteredPreachings = computed(() => {
       <div class="results-header">
 
         <h2>
-          {{ search ? 'Résultats' : 'Toutes les prédications' }}
+          {{
+            search.trim()
+              ? 'Résultats'
+              : 'Toutes les prédications'
+          }}
         </h2>
 
         <span class="results-count">
@@ -128,10 +143,63 @@ const filteredPreachings = computed(() => {
       </div>
 
 
-      <!-- Liste -->
+      <!-- =========================
+           CHARGEMENT
+      ========================== -->
 
       <div
-        v-if="filteredPreachings.length"
+        v-if="isLoading"
+        class="loading-state"
+      >
+        <LoaderCircle
+          :size="22"
+          class="loading-icon"
+        />
+
+        <span>
+          Chargement des prédications...
+        </span>
+      </div>
+
+
+      <!-- =========================
+           ERREUR
+      ========================== -->
+
+      <div
+        v-else-if="errorMessage"
+        class="error-state"
+      >
+
+        <div class="error-icon">
+          <Search :size="22" />
+        </div>
+
+        <h3>
+          Impossible de charger les prédications
+        </h3>
+
+        <p>
+          {{ errorMessage }}
+        </p>
+
+        <button
+          type="button"
+          class="retry-button"
+          @click="loadPreachings"
+        >
+          Réessayer
+        </button>
+
+      </div>
+
+
+      <!-- =========================
+           LISTE
+      ========================== -->
+
+      <div
+        v-else-if="filteredPreachings.length"
         class="preachings-list"
       >
 
@@ -144,7 +212,9 @@ const filteredPreachings = computed(() => {
       </div>
 
 
-      <!-- Aucun résultat -->
+      <!-- =========================
+           AUCUN RÉSULTAT
+      ========================== -->
 
       <div
         v-else
@@ -156,11 +226,19 @@ const filteredPreachings = computed(() => {
         </div>
 
         <h3>
-          Aucune prédication trouvée
+          {{
+            search.trim()
+              ? 'Aucune prédication trouvée'
+              : 'Aucune prédication disponible'
+          }}
         </h3>
 
         <p>
-          Essayez avec un autre titre ou nom de prédicateur.
+          {{
+            search.trim()
+              ? 'Essayez avec un autre titre ou nom de prédicateur.'
+              : 'Les prédications seront affichées ici dès qu’elles seront disponibles.'
+          }}
         </p>
 
       </div>
@@ -364,6 +442,40 @@ const filteredPreachings = computed(() => {
 
 
 /* =========================
+   CHARGEMENT
+========================= */
+
+.loading-state {
+  min-height: 140px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 10px;
+
+  color: var(--color-text-muted);
+
+  font-size: 13px;
+}
+
+.loading-icon {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+/* =========================
    LISTE
 ========================= */
 
@@ -372,6 +484,104 @@ const filteredPreachings = computed(() => {
   flex-direction: column;
 
   gap: 12px;
+}
+
+
+/* =========================
+   ERREUR
+========================= */
+
+.error-state {
+  padding: 32px 20px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  text-align: center;
+
+  background: var(--color-surface);
+
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.error-icon {
+  width: 48px;
+  height: 48px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-bottom: 14px;
+
+  border-radius: 50%;
+
+  background: var(--color-surface-secondary);
+  color: var(--color-text-secondary);
+
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease;
+}
+
+.error-state h3 {
+  margin: 0;
+
+  color: var(--color-text);
+
+  font-size: 15px;
+  font-weight: 650;
+
+  transition: color 0.25s ease;
+}
+
+.error-state p {
+  max-width: 320px;
+
+  margin: 6px 0 16px;
+
+  color: var(--color-text-muted);
+
+  font-size: 13px;
+  line-height: 1.5;
+
+  transition: color 0.25s ease;
+}
+
+.retry-button {
+  min-height: 38px;
+
+  padding: 0 16px;
+
+  border: none;
+  border-radius: 9px;
+
+  background: var(--color-text);
+  color: var(--color-surface);
+
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+
+.retry-button:hover {
+  opacity: 0.88;
+}
+
+.retry-button:active {
+  transform: scale(0.97);
 }
 
 

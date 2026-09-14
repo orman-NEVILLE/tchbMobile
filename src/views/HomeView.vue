@@ -1,23 +1,44 @@
 <script setup>
-import { ChevronRight } from 'lucide-vue-next'
-import PreachingCard from '@/components/PreachingCard.vue'
+import {
+  ChevronRight,
+  LoaderCircle,
+} from 'lucide-vue-next'
 
-const recentPreachings = [
-  {
-    id: 1,
-    title: 'La foi qui transforme',
-    preacher: 'Pasteur Jean',
-    date: '07 Septembre 2026',
-    duration: '32:15',
-  },
-  {
-    id: 2,
-    title: 'Le chemin de la foi',
-    preacher: 'Pasteur David',
-    date: '05 Septembre 2026',
-    duration: '41:20',
-  },
-]
+import { onMounted, ref } from 'vue'
+
+import PreachingCard from '@/components/PreachingCard.vue'
+import { getSermons } from '@/functions/sermons'
+
+const recentPreachings = ref([])
+
+const isLoading = ref(true)
+const errorMessage = ref('')
+
+const loadRecentPreachings = async () => {
+  isLoading.value = true
+  errorMessage.value = ''
+
+  try {
+    const response = await getSermons()
+
+    recentPreachings.value = response.data.slice(0, 2)
+  } catch (error) {
+    console.error(
+      'Erreur lors du chargement des prédications :',
+      error
+    )
+
+    errorMessage.value =
+      error.message ||
+      'Impossible de charger les prédications.'
+  } finally {
+    isLoading.value = false
+  }
+}
+
+onMounted(() => {
+  loadRecentPreachings()
+})
 </script>
 
 <template>
@@ -69,7 +90,43 @@ const recentPreachings = [
 
       </div>
 
-      <div class="preachings-list">
+      <!-- =========================
+           CHARGEMENT
+      ========================== -->
+
+      <div
+        v-if="isLoading"
+        class="loading-state"
+      >
+        <LoaderCircle
+          :size="22"
+          class="loading-icon"
+        />
+
+        <span>
+          Chargement des prédications...
+        </span>
+      </div>
+
+      <!-- =========================
+           ERREUR
+      ========================== -->
+
+      <div
+        v-else-if="errorMessage"
+        class="error-state"
+      >
+        {{ errorMessage }}
+      </div>
+
+      <!-- =========================
+           PRÉDICATIONS
+      ========================== -->
+
+      <div
+        v-else-if="recentPreachings.length"
+        class="preachings-list"
+      >
 
         <PreachingCard
           v-for="preaching in recentPreachings"
@@ -77,6 +134,17 @@ const recentPreachings = [
           :preaching="preaching"
         />
 
+      </div>
+
+      <!-- =========================
+           AUCUNE PRÉDICATION
+      ========================== -->
+
+      <div
+        v-else
+        class="empty-state"
+      >
+        Aucune prédication disponible pour le moment.
       </div>
 
     </section>
@@ -223,6 +291,73 @@ const recentPreachings = [
 
 
 /* =========================
+   CHARGEMENT
+========================= */
+
+.loading-state {
+  min-height: 100px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 10px;
+
+  color: var(--color-text-muted);
+
+  font-size: 13px;
+}
+
+.loading-icon {
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+/* =========================
+   ERREUR
+========================= */
+
+.error-state {
+  padding: 16px;
+
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+
+  background: var(--color-surface-secondary);
+
+  color: var(--color-text-secondary);
+
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+
+/* =========================
+   ÉTAT VIDE
+========================= */
+
+.empty-state {
+  padding: 24px 16px;
+
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+
+  background: var(--color-surface-secondary);
+
+  color: var(--color-text-muted);
+
+  font-size: 13px;
+  text-align: center;
+}
+
+
+/* =========================
    MOBILE
 ========================= */
 
@@ -256,4 +391,3 @@ const recentPreachings = [
   }
 }
 </style>
-

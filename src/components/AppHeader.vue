@@ -136,8 +136,8 @@ onBeforeUnmount(() => {
 }
 
 .brand-logo {
-  width: 36px;
-  height: 36px;
+  width: 48px;
+  height: 48px;
 
   display: block;
 

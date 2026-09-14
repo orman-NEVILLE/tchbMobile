@@ -3,79 +3,143 @@ import {
   ArrowLeft,
   CalendarDays,
   Clock,
+  LoaderCircle,
   Mic2,
   User,
 } from 'lucide-vue-next'
 
+import {
+  computed,
+  onMounted,
+  ref,
+} from 'vue'
+
+import { useRoute } from 'vue-router'
+
 import AudioPlayer from '@/components/AudioPlayer.vue'
 import VideoPlayer from '@/components/VideoPlayer.vue'
 
-import { computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { getSermon } from '@/functions/sermons'
 
 const route = useRoute()
 
-const preachings = [
-  {
-    id: 1,
-    title: 'La foi qui transforme',
-    preacher: 'Pasteur Jean',
-    date: '07 Septembre 2026',
-    duration: '32:15',
-    description:
-      'Un enseignement sur la foi et son pouvoir de transformer notre manière de vivre, de penser et de marcher avec Dieu.',
-    video: '/media/videos/predication-1.mp4',
-    audio: '/media/audio/predication-1.mp3',
-  },
-  {
-    id: 2,
-    title: 'Le chemin de la foi',
-    preacher: 'Pasteur David',
-    date: '05 Septembre 2026',
-    duration: '41:20',
-    description:
-      'Un enseignement sur le cheminement de la foi et les différentes étapes de notre marche avec Dieu.',
-  },
-  {
-    id: 3,
-    title: 'Marcher dans la lumière',
-    preacher: 'Pasteur Jean',
-    date: '01 Septembre 2026',
-    duration: '36:42',
-    description:
-      'Une réflexion sur l’importance de marcher dans la lumière et de rester attaché à la Parole de Dieu.',
-  },
-  {
-    id: 4,
-    title: 'Une foi persévérante',
-    preacher: 'Pasteur David',
-    date: '28 Août 2026',
-    duration: '29:18',
-    description:
-      'Un enseignement consacré à la persévérance dans la foi malgré les difficultés rencontrées.',
-  },
-  {
-    id: 5,
-    title: 'La puissance de la Parole',
-    preacher: 'Pasteur Michel',
-    date: '24 Août 2026',
-    duration: '44:07',
-    description:
-      'Découvrez l’importance de la Parole de Dieu dans notre vie et dans notre croissance spirituelle.',
-  },
-]
+const preaching = ref(null)
 
-const preaching = computed(() => {
-  return preachings.find(
-    (item) => item.id === Number(route.params.id)
+const isLoading = ref(true)
+const errorMessage = ref('')
+
+const loadPreaching = async () => {
+  isLoading.value = true
+  errorMessage.value = ''
+  preaching.value = null
+
+  try {
+    const id = route.params.id
+
+    if (!id) {
+      errorMessage.value =
+        'Identifiant de prédication invalide.'
+
+      return
+    }
+
+    const response = await getSermon(id)
+
+    console.log('Réponse API :', response)
+
+    preaching.value = response.data
+
+    console.log('Prédication :', preaching.value)
+    console.log('Médias :', preaching.value?.media)
+
+  } catch (error) {
+    console.error(
+      'Erreur lors du chargement de la prédication :',
+      error
+    )
+
+    if (error.status === 404) {
+      errorMessage.value =
+        'La prédication demandée n’existe pas ou n’est plus disponible.'
+    } else {
+      errorMessage.value =
+        error.message ||
+        'Impossible de charger cette prédication.'
+    }
+  } finally {
+    isLoading.value = false
+  }
+}
+
+
+/* =========================
+   MÉDIAS
+========================= */
+
+const audioMedia = computed(() => {
+  return preaching.value?.media?.find(
+    (media) => media.type === 'audio'
+  ) || null
+})
+
+const videoMedia = computed(() => {
+  return preaching.value?.media?.find(
+    (media) => media.type === 'video'
+  ) || null
+})
+
+
+/* =========================
+   DATE
+========================= */
+
+const formattedDate = computed(() => {
+  const date = preaching.value?.preached_at
+
+  if (!date) {
+    return 'Date inconnue'
+  }
+
+  const parsedDate = new Date(date)
+
+  if (Number.isNaN(parsedDate.getTime())) {
+    return date
+  }
+
+  return new Intl.DateTimeFormat('fr-FR', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+  }).format(parsedDate)
+})
+
+
+/* =========================
+   DURÉE
+========================= */
+
+const duration = computed(() => {
+  return (
+    audioMedia.value?.duration ||
+    videoMedia.value?.duration ||
+    preaching.value?.duration ||
+    null
   )
+})
+
+
+onMounted(() => {
+  loadPreaching()
 })
 </script>
 
 <template>
   <div class="detail-page">
 
-    <!-- Retour -->
+    <!-- =========================
+         RETOUR
+    ========================== -->
+
     <RouterLink
       to="/predications"
       class="back-link"
@@ -87,10 +151,67 @@ const preaching = computed(() => {
       </span>
     </RouterLink>
 
-    <!-- Prédication trouvée -->
-    <template v-if="preaching">
 
-      <!-- En-tête -->
+    <!-- =========================
+         CHARGEMENT
+    ========================== -->
+
+    <section
+      v-if="isLoading"
+      class="loading-state"
+    >
+      <LoaderCircle
+        :size="26"
+        class="loading-icon"
+      />
+
+      <span>
+        Chargement de la prédication...
+      </span>
+    </section>
+
+
+    <!-- =========================
+         ERREUR / INTRouvable
+    ========================== -->
+
+    <section
+      v-else-if="errorMessage"
+      class="not-found"
+    >
+
+      <div class="not-found-icon">
+        <Mic2 :size="24" />
+      </div>
+
+      <h2>
+        Prédication introuvable
+      </h2>
+
+      <p>
+        {{ errorMessage }}
+      </p>
+
+      <RouterLink
+        to="/predications"
+        class="back-to-list"
+      >
+        Voir les prédications
+      </RouterLink>
+
+    </section>
+
+
+    <!-- =========================
+         PRÉDICATION
+    ========================== -->
+
+    <template v-else-if="preaching">
+
+      <!-- =========================
+           EN-TÊTE
+      ========================== -->
+
       <section class="detail-header">
 
         <div class="detail-icon">
@@ -107,92 +228,127 @@ const preaching = computed(() => {
           </h1>
 
           <p>
-            Une prédication pour fortifier votre foi
-            et votre marche avec Dieu.
+            {{
+              preaching.description ||
+              'Une prédication pour fortifier votre foi et votre marche avec Dieu.'
+            }}
           </p>
 
         </div>
 
       </section>
 
-      <!-- Vidéo -->
+
+      <!-- =========================
+           VIDÉO
+      ========================== -->
+
       <section
-        v-if="preaching.video"
+        v-if="videoMedia"
         class="video-card"
       >
         <VideoPlayer
-          :src="preaching.video"
+          :src="videoMedia.url"
         />
       </section>
 
-      <!-- Audio -->
+
+      <!-- =========================
+           AUDIO
+      ========================== -->
+
       <section
-        v-if="preaching.audio"
+        v-if="audioMedia"
         class="audio-card"
       >
         <AudioPlayer
-          :src="preaching.audio"
+          :src="audioMedia.url"
         />
       </section>
 
-      <!-- Informations -->
+
+      <!-- =========================
+           INFORMATIONS
+      ========================== -->
+
       <section class="info-card">
 
         <!-- Prédicateur -->
+
         <div class="info-item">
 
           <User :size="18" />
 
           <div>
+
             <span>
               Prédicateur
             </span>
 
             <strong>
-              {{ preaching.preacher }}
+              {{ preaching.preacher_name }}
             </strong>
+
           </div>
 
         </div>
 
+
         <!-- Date -->
+
         <div class="info-item">
 
           <CalendarDays :size="18" />
 
           <div>
+
             <span>
               Date
             </span>
 
             <strong>
-              {{ preaching.date }}
+              {{ formattedDate }}
             </strong>
+
           </div>
 
         </div>
 
+
         <!-- Durée -->
-        <div class="info-item">
+
+        <div
+          v-if="duration"
+          class="info-item"
+        >
 
           <Clock :size="18" />
 
           <div>
+
             <span>
               Durée
             </span>
 
             <strong>
-              {{ preaching.duration }}
+              {{ duration }}
             </strong>
+
           </div>
 
         </div>
 
       </section>
 
-      <!-- Description -->
-      <section class="description-card">
+
+      <!-- =========================
+           DESCRIPTION
+      ========================== -->
+
+      <section
+        v-if="preaching.description"
+        class="description-card"
+      >
 
         <h2>
           À propos de cette prédication
@@ -205,33 +361,6 @@ const preaching = computed(() => {
       </section>
 
     </template>
-
-    <!-- Prédication inexistante -->
-    <section
-      v-else
-      class="not-found"
-    >
-
-      <div class="not-found-icon">
-        <Mic2 :size="24" />
-      </div>
-
-      <h2>
-        Prédication introuvable
-      </h2>
-
-      <p>
-        La prédication demandée n'existe pas ou n'est plus disponible.
-      </p>
-
-      <RouterLink
-        to="/predications"
-        class="back-to-list"
-      >
-        Voir les prédications
-      </RouterLink>
-
-    </section>
 
   </div>
 </template>
@@ -246,6 +375,7 @@ const preaching = computed(() => {
 
   transition: color 0.25s ease;
 }
+
 
 /* =========================
    Retour
@@ -271,6 +401,41 @@ const preaching = computed(() => {
 .back-link:hover {
   color: var(--color-text);
 }
+
+
+/* =========================
+   Chargement
+========================= */
+
+.loading-state {
+  min-height: 220px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 10px;
+
+  color: var(--color-text-muted);
+
+  font-size: 13px;
+}
+
+.loading-icon {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 
 /* =========================
    En-tête
@@ -329,6 +494,7 @@ const preaching = computed(() => {
   transition: color 0.25s ease;
 }
 
+
 /* =========================
    Vidéo
 ========================= */
@@ -339,6 +505,7 @@ const preaching = computed(() => {
   overflow: hidden;
 
   background: var(--color-surface);
+
   border: 1px solid var(--color-border);
   border-radius: 14px;
 
@@ -346,6 +513,7 @@ const preaching = computed(() => {
     background-color 0.25s ease,
     border-color 0.25s ease;
 }
+
 
 /* =========================
    Audio
@@ -358,6 +526,7 @@ const preaching = computed(() => {
   padding: 16px;
 
   background: var(--color-surface);
+
   border: 1px solid var(--color-border);
   border-radius: 14px;
 
@@ -366,18 +535,22 @@ const preaching = computed(() => {
     border-color 0.25s ease;
 }
 
+
 /* =========================
    Informations
 ========================= */
 
 .info-card {
   display: grid;
+
   grid-template-columns: repeat(3, 1fr);
+
   gap: 12px;
 
   padding: 16px;
 
   background: var(--color-surface);
+
   border: 1px solid var(--color-border);
   border-radius: 14px;
 
@@ -389,6 +562,7 @@ const preaching = computed(() => {
 .info-item {
   display: flex;
   align-items: center;
+
   gap: 10px;
 
   min-width: 0;
@@ -405,6 +579,7 @@ const preaching = computed(() => {
 .info-item div {
   display: flex;
   flex-direction: column;
+
   gap: 3px;
 
   min-width: 0;
@@ -427,6 +602,7 @@ const preaching = computed(() => {
   transition: color 0.25s ease;
 }
 
+
 /* =========================
    Description
 ========================= */
@@ -435,6 +611,7 @@ const preaching = computed(() => {
   padding: 20px;
 
   background: var(--color-surface);
+
   border: 1px solid var(--color-border);
   border-radius: 14px;
 
@@ -465,8 +642,9 @@ const preaching = computed(() => {
   transition: color 0.25s ease;
 }
 
+
 /* =========================
-   Prédication introuvable
+   Introuvable
 ========================= */
 
 .not-found {
@@ -479,6 +657,7 @@ const preaching = computed(() => {
   text-align: center;
 
   background: var(--color-surface);
+
   border: 1px solid var(--color-border);
   border-radius: 14px;
 
@@ -519,7 +698,7 @@ const preaching = computed(() => {
 }
 
 .not-found p {
-  max-width: 300px;
+  max-width: 340px;
 
   margin: 7px 0 18px;
 
@@ -558,6 +737,7 @@ const preaching = computed(() => {
 .back-to-list:hover {
   background: var(--color-text-secondary);
 }
+
 
 /* =========================
    Mobile

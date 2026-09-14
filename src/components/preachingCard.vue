@@ -7,6 +7,45 @@ defineProps({
     required: true,
   },
 })
+
+const formatDate = (date) => {
+  if (!date) {
+    return ''
+  }
+
+  const parsedDate = new Date(date)
+
+  if (Number.isNaN(parsedDate.getTime())) {
+    return date
+  }
+
+  return new Intl.DateTimeFormat('fr-FR', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+  }).format(parsedDate)
+}
+
+const getDuration = (preaching) => {
+  const audio = preaching.media?.find(
+    (media) => media.type === 'audio'
+  )
+
+  const video = preaching.media?.find(
+    (media) => media.type === 'video'
+  )
+
+  const duration =
+    audio?.duration ??
+    video?.duration ??
+    preaching.duration
+
+  if (!duration) {
+    return null
+  }
+
+  return duration
+}
 </script>
 
 <template>
@@ -30,18 +69,22 @@ defineProps({
       </h3>
 
       <p class="preacher">
-        {{ preaching.preacher }}
+        {{ preaching.preacher_name }}
       </p>
 
       <div class="metadata">
-        <span>{{ preaching.date }}</span>
-
-        <span class="separator">•</span>
-
-        <span class="duration">
-          <Clock :size="14" />
-          {{ preaching.duration }}
+        <span>
+          {{ formatDate(preaching.preached_at) }}
         </span>
+
+        <template v-if="getDuration(preaching)">
+          <span class="separator">•</span>
+
+          <span class="duration">
+            <Clock :size="14" />
+            {{ getDuration(preaching) }}
+          </span>
+        </template>
       </div>
     </div>
   </RouterLink>

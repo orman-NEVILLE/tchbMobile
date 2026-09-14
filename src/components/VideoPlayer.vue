@@ -10,6 +10,7 @@ import {
   onBeforeUnmount,
   onMounted,
   ref,
+  watch,
 } from 'vue'
 
 const props = defineProps({
@@ -21,6 +22,7 @@ const props = defineProps({
 
 const videoElement = ref(null)
 const isPlaying = ref(false)
+const videoError = ref(null)
 
 /* =========================
    Lecture / pause
@@ -59,6 +61,41 @@ const handlePause = () => {
 
 const handleEnded = () => {
   isPlaying.value = false
+}
+
+const handleLoadedMetadata = () => {
+  console.log(
+    'Métadonnées vidéo chargées :',
+    videoElement.value?.duration
+  )
+}
+
+const handleLoadedData = () => {
+  console.log('Données vidéo chargées.')
+}
+
+const handleCanPlay = () => {
+  console.log('Vidéo prête à être lue.')
+}
+
+const handleVideoError = () => {
+  const video = videoElement.value
+
+  if (!video) {
+    return
+  }
+
+  const error = video.error
+
+  videoError.value = error
+
+  console.error('Erreur vidéo :', {
+    code: error?.code,
+    message: error?.message,
+    src: video.currentSrc,
+    networkState: video.networkState,
+    readyState: video.readyState,
+  })
 }
 
 /* =========================
@@ -104,7 +141,6 @@ const handleVideoClick = (event) => {
   }
 
   const video = videoElement.value
-
   const rect = video.getBoundingClientRect()
 
   const clickPosition =
@@ -117,6 +153,25 @@ const handleVideoClick = (event) => {
   } else {
     forward()
   }
+}
+
+/* =========================
+   Chargement de la source
+========================= */
+
+const loadVideo = () => {
+  if (!videoElement.value || !props.src) {
+    return
+  }
+
+  console.log(
+    'Chargement vidéo :',
+    props.src
+  )
+
+  videoError.value = null
+
+  videoElement.value.load()
 }
 
 /* =========================
@@ -142,7 +197,40 @@ onMounted(() => {
     'ended',
     handleEnded
   )
+
+  videoElement.value.addEventListener(
+    'loadedmetadata',
+    handleLoadedMetadata
+  )
+
+  videoElement.value.addEventListener(
+    'loadeddata',
+    handleLoadedData
+  )
+
+  videoElement.value.addEventListener(
+    'canplay',
+    handleCanPlay
+  )
+
+  videoElement.value.addEventListener(
+    'error',
+    handleVideoError
+  )
+
+  loadVideo()
 })
+
+/* =========================
+   Changement de source
+========================= */
+
+watch(
+  () => props.src,
+  () => {
+    loadVideo()
+  }
+)
 
 /* =========================
    Nettoyage
@@ -167,6 +255,26 @@ onBeforeUnmount(() => {
     'ended',
     handleEnded
   )
+
+  videoElement.value.removeEventListener(
+    'loadedmetadata',
+    handleLoadedMetadata
+  )
+
+  videoElement.value.removeEventListener(
+    'loadeddata',
+    handleLoadedData
+  )
+
+  videoElement.value.removeEventListener(
+    'canplay',
+    handleCanPlay
+  )
+
+  videoElement.value.removeEventListener(
+    'error',
+    handleVideoError
+  )
 })
 </script>
 
@@ -189,7 +297,6 @@ onBeforeUnmount(() => {
     <!-- Contrôles supplémentaires -->
     <div class="video-controls">
 
-      <!-- -10 secondes -->
       <button
         type="button"
         class="control-button secondary"
@@ -200,7 +307,6 @@ onBeforeUnmount(() => {
         <Rewind :size="18" />
       </button>
 
-      <!-- Lecture / pause -->
       <button
         type="button"
         class="control-button play"
@@ -231,7 +337,6 @@ onBeforeUnmount(() => {
         />
       </button>
 
-      <!-- +10 secondes -->
       <button
         type="button"
         class="control-button secondary"
@@ -260,10 +365,6 @@ onBeforeUnmount(() => {
   transition: border-color 0.25s ease;
 }
 
-/* =========================
-   Vidéo
-========================= */
-
 .video {
   display: block;
 
@@ -273,10 +374,6 @@ onBeforeUnmount(() => {
 
   background: #000000;
 }
-
-/* =========================
-   Contrôles
-========================= */
 
 .video-controls {
   display: flex;
@@ -317,10 +414,6 @@ onBeforeUnmount(() => {
   transform: scale(0.96);
 }
 
-/* =========================
-   Boutons secondaires
-========================= */
-
 .control-button.secondary {
   width: 38px;
   height: 38px;
@@ -341,10 +434,6 @@ onBeforeUnmount(() => {
   color: var(--color-text);
 }
 
-/* =========================
-   Bouton principal
-========================= */
-
 .control-button.play {
   width: 50px;
   height: 50px;
@@ -360,12 +449,7 @@ onBeforeUnmount(() => {
     transform 0.15s ease;
 }
 
-/* =========================
-   Mobile
-========================= */
-
 @media (max-width: 480px) {
-
   .video-controls {
     gap: 10px;
 
