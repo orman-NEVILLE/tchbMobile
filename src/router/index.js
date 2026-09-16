@@ -6,7 +6,7 @@ import PreachingDetailView from '@/views/PreachingDetailView.vue'
 import RegisterRequestView from '@/views/RegisterRequestView.vue'
 import LoginView from '@/views/LoginView.vue'
 import ProfileView from '@/views/ProfileView.vue'
-import ChantsView from '@/views/ChantsView.vue'
+
 
 const router = createRouter({
   history: createWebHistory(),
@@ -30,22 +30,17 @@ const router = createRouter({
     {
       path: '/chants',
       name: 'chants',
-      component: ChantsView,
+      component: () => import('@/views/ChantsView.vue'),
     },
     {
-    path: '/chants',
-    name: 'chants',
-    component: () => import('@/views/ChantsView.vue'),
-    },
-    {
-      path: '/chants/louange',
-      name: 'chants-louange',
+      path: '/chants/:category',
+      name: 'chants-category',
       component: () => import('@/views/ChantsCategoryView.vue'),
     },
     {
-      path: '/chants/meditation',
-      name: 'chants-meditation',
-      component: () => import('@/views/ChantsCategoryView.vue'),
+      path: '/chants/:category/:id',
+      name: 'chant-detail',
+      component: () => import('@/views/ChantDetailView.vue'),
     },
     {
     path: '/inscription',
