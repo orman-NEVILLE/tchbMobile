@@ -1,9 +1,8 @@
 <script setup>
 import {
   Home,
-  LoaderCircle,
   Mic2,
-  Music2
+  Music2,
 } from 'lucide-vue-next'
 
 import {
@@ -11,7 +10,17 @@ import {
   ref,
 } from 'vue'
 
+import { useRoute } from 'vue-router'
+
 import AppHeader from '@/components/AppHeader.vue'
+
+const route = useRoute()
+
+/*
+|--------------------------------------------------------------------------
+| Splash screen
+|--------------------------------------------------------------------------
+*/
 
 const isAppLoading = ref(true)
 
@@ -20,6 +29,52 @@ onMounted(() => {
     isAppLoading.value = false
   }, 1400)
 })
+
+/*
+|--------------------------------------------------------------------------
+| Navigation principale
+|--------------------------------------------------------------------------
+|
+| Une rubrique reste active sur toutes ses pages enfants.
+|
+| Accueil
+|   └── home
+|
+| Prédications
+|   ├── preachings
+|   └── preaching-detail
+|
+| Chants
+|   ├── chants
+|   ├── chants-category
+|   └── chant-detail
+|
+|--------------------------------------------------------------------------
+*/
+
+const isNavActive = (section) => {
+  switch (section) {
+
+    case 'home':
+      return route.name === 'home'
+
+    case 'preachings':
+      return [
+        'preachings',
+        'preaching-detail',
+      ].includes(route.name)
+
+    case 'chants':
+      return [
+        'chants',
+        'chants-category',
+        'chant-detail',
+      ].includes(route.name)
+
+    default:
+      return false
+  }
+}
 </script>
 
 <template>
@@ -84,9 +139,13 @@ onMounted(() => {
       aria-label="Navigation principale"
     >
 
+      <!-- Accueil -->
       <RouterLink
         to="/"
         class="nav-item"
+        :class="{
+          active: isNavActive('home'),
+        }"
       >
         <Home
           :size="22"
@@ -99,9 +158,13 @@ onMounted(() => {
       </RouterLink>
 
 
+      <!-- Prédications -->
       <RouterLink
         to="/predications"
         class="nav-item"
+        :class="{
+          active: isNavActive('preachings'),
+        }"
       >
         <Mic2
           :size="22"
@@ -112,10 +175,15 @@ onMounted(() => {
           Prédications
         </span>
       </RouterLink>
-      
+
+
+      <!-- Chants -->
       <RouterLink
         to="/chants"
         class="nav-item"
+        :class="{
+          active: isNavActive('chants'),
+        }"
       >
         <Music2
           :size="22"
@@ -342,13 +410,23 @@ onMounted(() => {
   color: var(--color-text-secondary);
 }
 
-.nav-item.router-link-active {
+/*
+|--------------------------------------------------------------------------
+| État actif
+|--------------------------------------------------------------------------
+|
+| IMPORTANT :
+| On utilise .active et non .router-link-active.
+|
+*/
+
+.nav-item.active {
   color: var(--color-text);
 
   font-weight: 600;
 }
 
-.nav-item.router-link-active svg {
+.nav-item.active svg {
   stroke-width: 2.5;
 }
 
