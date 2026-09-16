@@ -6,6 +6,7 @@ import PreachingDetailView from '@/views/PreachingDetailView.vue'
 import RegisterRequestView from '@/views/RegisterRequestView.vue'
 import LoginView from '@/views/LoginView.vue'
 import ProfileView from '@/views/ProfileView.vue'
+import ChantsView from '@/views/ChantsView.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -25,6 +26,11 @@ const router = createRouter({
       path: '/predications/:id',
       name: 'preaching-detail',
       component: PreachingDetailView,
+    },
+    {
+      path: '/chants',
+      name: 'chants',
+      component: ChantsView,
     },
     {
     path: '/inscription',

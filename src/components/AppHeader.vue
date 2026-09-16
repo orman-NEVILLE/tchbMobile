@@ -22,6 +22,9 @@ const pageTitle = computed(() => {
     case 'preachings':
       return 'Prédications'
 
+    case 'chants':
+      return 'Chants'
+
     case 'preaching-detail':
       return 'Prédication'
 
