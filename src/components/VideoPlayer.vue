@@ -21,23 +21,28 @@ const props = defineProps({
 })
 
 const videoElement = ref(null)
+
 const isPlaying = ref(false)
-const videoError = ref(null)
+const hasError = ref(false)
+const isReady = ref(false)
+
 
 /* =========================
-   Lecture / pause
+   LECTURE / PAUSE
 ========================= */
 
 const togglePlay = async () => {
-  if (!videoElement.value) {
+  const video = videoElement.value
+
+  if (!video) {
     return
   }
 
   try {
-    if (isPlaying.value) {
-      videoElement.value.pause()
+    if (video.paused) {
+      await video.play()
     } else {
-      await videoElement.value.play()
+      video.pause()
     }
   } catch (error) {
     console.error(
@@ -47,8 +52,79 @@ const togglePlay = async () => {
   }
 }
 
+
 /* =========================
-   Événements vidéo
+   RECULER
+========================= */
+
+const rewind = () => {
+  const video = videoElement.value
+
+  if (!video) {
+    return
+  }
+
+  video.currentTime = Math.max(
+    0,
+    video.currentTime - 10
+  )
+}
+
+
+/* =========================
+   AVANCER
+========================= */
+
+const forward = () => {
+  const video = videoElement.value
+
+  if (
+    !video ||
+    !Number.isFinite(video.duration)
+  ) {
+    return
+  }
+
+  video.currentTime = Math.min(
+    video.duration,
+    video.currentTime + 10
+  )
+}
+
+
+/* =========================
+   CLIC SUR LA VIDÉO
+========================= */
+
+const handleVideoClick = (event) => {
+  const video = videoElement.value
+
+  if (!video || !isReady.value) {
+    return
+  }
+
+  /*
+   * On ne fait rien si le clic vient
+   * d'un contrôle natif du navigateur.
+   */
+
+  const rect = video.getBoundingClientRect()
+
+  const position =
+    event.clientX - rect.left
+
+  const middle = rect.width / 2
+
+  if (position < middle) {
+    rewind()
+  } else {
+    forward()
+  }
+}
+
+
+/* =========================
+   ÉVÉNEMENTS
 ========================= */
 
 const handlePlay = () => {
@@ -63,166 +139,93 @@ const handleEnded = () => {
   isPlaying.value = false
 }
 
-const handleLoadedMetadata = () => {
-  console.log(
-    'Métadonnées vidéo chargées :',
-    videoElement.value?.duration
-  )
-}
-
-const handleLoadedData = () => {
-  console.log('Données vidéo chargées.')
-}
-
 const handleCanPlay = () => {
-  console.log('Vidéo prête à être lue.')
+  isReady.value = true
+  hasError.value = false
 }
 
-const handleVideoError = () => {
+const handleError = () => {
+  isPlaying.value = false
+  isReady.value = false
+  hasError.value = true
+
   const video = videoElement.value
 
   if (!video) {
     return
   }
 
-  const error = video.error
-
-  videoError.value = error
-
-  console.error('Erreur vidéo :', {
-    code: error?.code,
-    message: error?.message,
-    src: video.currentSrc,
-    networkState: video.networkState,
-    readyState: video.readyState,
-  })
-}
-
-/* =========================
-   Reculer de 10 secondes
-========================= */
-
-const rewind = () => {
-  if (!videoElement.value) {
-    return
-  }
-
-  videoElement.value.currentTime = Math.max(
-    0,
-    videoElement.value.currentTime - 10
+  console.error(
+    'Erreur lors du chargement de la vidéo :',
+    {
+      src: video.currentSrc,
+      error: video.error,
+    }
   )
 }
 
-/* =========================
-   Avancer de 10 secondes
-========================= */
-
-const forward = () => {
-  if (
-    !videoElement.value ||
-    !Number.isFinite(videoElement.value.duration)
-  ) {
-    return
-  }
-
-  videoElement.value.currentTime = Math.min(
-    videoElement.value.duration,
-    videoElement.value.currentTime + 10
-  )
-}
 
 /* =========================
-   Clic sur la vidéo
-========================= */
-
-const handleVideoClick = (event) => {
-  if (!videoElement.value) {
-    return
-  }
-
-  const video = videoElement.value
-  const rect = video.getBoundingClientRect()
-
-  const clickPosition =
-    event.clientX - rect.left
-
-  const middle = rect.width / 2
-
-  if (clickPosition < middle) {
-    rewind()
-  } else {
-    forward()
-  }
-}
-
-/* =========================
-   Chargement de la source
+   CHARGEMENT
 ========================= */
 
 const loadVideo = () => {
-  if (!videoElement.value || !props.src) {
+  const video = videoElement.value
+
+  if (!video || !props.src) {
     return
   }
 
-  console.log(
-    'Chargement vidéo :',
-    props.src
-  )
+  isPlaying.value = false
+  isReady.value = false
+  hasError.value = false
 
-  videoError.value = null
-
-  videoElement.value.load()
+  video.load()
 }
 
+
 /* =========================
-   Montage
+   MONTAGE
 ========================= */
 
 onMounted(() => {
-  if (!videoElement.value) {
+  const video = videoElement.value
+
+  if (!video) {
     return
   }
 
-  videoElement.value.addEventListener(
+  video.addEventListener(
     'play',
     handlePlay
   )
 
-  videoElement.value.addEventListener(
+  video.addEventListener(
     'pause',
     handlePause
   )
 
-  videoElement.value.addEventListener(
+  video.addEventListener(
     'ended',
     handleEnded
   )
 
-  videoElement.value.addEventListener(
-    'loadedmetadata',
-    handleLoadedMetadata
-  )
-
-  videoElement.value.addEventListener(
-    'loadeddata',
-    handleLoadedData
-  )
-
-  videoElement.value.addEventListener(
+  video.addEventListener(
     'canplay',
     handleCanPlay
   )
 
-  videoElement.value.addEventListener(
+  video.addEventListener(
     'error',
-    handleVideoError
+    handleError
   )
 
   loadVideo()
 })
 
+
 /* =========================
-   Changement de source
+   SOURCE
 ========================= */
 
 watch(
@@ -232,119 +235,160 @@ watch(
   }
 )
 
+
 /* =========================
-   Nettoyage
+   NETTOYAGE
 ========================= */
 
 onBeforeUnmount(() => {
-  if (!videoElement.value) {
+  const video = videoElement.value
+
+  if (!video) {
     return
   }
 
-  videoElement.value.removeEventListener(
+  video.removeEventListener(
     'play',
     handlePlay
   )
 
-  videoElement.value.removeEventListener(
+  video.removeEventListener(
     'pause',
     handlePause
   )
 
-  videoElement.value.removeEventListener(
+  video.removeEventListener(
     'ended',
     handleEnded
   )
 
-  videoElement.value.removeEventListener(
-    'loadedmetadata',
-    handleLoadedMetadata
-  )
-
-  videoElement.value.removeEventListener(
-    'loadeddata',
-    handleLoadedData
-  )
-
-  videoElement.value.removeEventListener(
+  video.removeEventListener(
     'canplay',
     handleCanPlay
   )
 
-  videoElement.value.removeEventListener(
+  video.removeEventListener(
     'error',
-    handleVideoError
+    handleError
   )
 })
 </script>
 
+
 <template>
   <div class="video-player">
 
-    <!-- Vidéo -->
-    <video
-      ref="videoElement"
-      class="video"
-      controls
-      preload="metadata"
-      :src="props.src"
-      @click="handleVideoClick"
-    >
-      Votre navigateur ne prend pas en charge
-      la lecture vidéo.
-    </video>
+    <!-- =========================
+         VIDÉO
+    ========================== -->
 
-    <!-- Contrôles supplémentaires -->
-    <div class="video-controls">
+    <div class="video-wrapper">
+
+      <video
+        ref="videoElement"
+        class="video"
+        controls
+        preload="metadata"
+        playsinline
+        :src="props.src"
+        @click="handleVideoClick"
+      >
+        Votre navigateur ne prend pas en charge
+        la lecture vidéo.
+      </video>
+
+
+      <!-- ERREUR -->
+
+      <div
+        v-if="hasError"
+        class="video-error"
+      >
+        <p>
+          Impossible de charger cette vidéo.
+        </p>
+
+        <button
+          type="button"
+          @click="loadVideo"
+        >
+          Réessayer
+        </button>
+      </div>
+
+    </div>
+
+
+    <!-- =========================
+         CONTRÔLES RAPIDES
+    ========================== -->
+
+    <div class="quick-controls">
 
       <button
         type="button"
-        class="control-button secondary"
+        class="quick-button"
         aria-label="Reculer de 10 secondes"
         title="Reculer de 10 secondes"
         @click="rewind"
       >
-        <Rewind :size="18" />
+        <Rewind
+          :size="17"
+          :stroke-width="1.9"
+        />
+
+        <span>
+          10
+        </span>
       </button>
+
 
       <button
         type="button"
-        class="control-button play"
+        class="play-button"
         :aria-label="
           isPlaying
             ? 'Mettre en pause'
-            : 'Lire'
+            : 'Lire la vidéo'
         "
         :title="
           isPlaying
             ? 'Mettre en pause'
-            : 'Lire'
+            : 'Lire la vidéo'
         "
         @click="togglePlay"
       >
         <Pause
           v-if="isPlaying"
-          :size="22"
-          :stroke-width="2.5"
+          :size="20"
+          :stroke-width="2.2"
           fill="currentColor"
         />
 
         <Play
           v-else
-          :size="22"
-          :stroke-width="2.5"
+          :size="20"
+          :stroke-width="2.2"
           fill="currentColor"
         />
       </button>
 
+
       <button
         type="button"
-        class="control-button secondary"
+        class="quick-button"
         aria-label="Avancer de 10 secondes"
         title="Avancer de 10 secondes"
         @click="forward"
       >
-        <FastForward :size="18" />
+        <FastForward
+          :size="17"
+          :stroke-width="1.9"
+        />
+
+        <span>
+          10
+        </span>
       </button>
 
     </div>
@@ -352,118 +396,240 @@ onBeforeUnmount(() => {
   </div>
 </template>
 
+
 <style scoped>
+/* =========================
+   CONTENEUR
+========================= */
+
 .video-player {
   width: 100%;
+
   overflow: hidden;
 
-  background: #000000;
+  background: #000;
 
-  border: 1px solid var(--color-border);
   border-radius: 14px;
+}
 
-  transition: border-color 0.25s ease;
+
+/* =========================
+   VIDÉO
+========================= */
+
+.video-wrapper {
+  position: relative;
+
+  width: 100%;
+
+  background: #000;
 }
 
 .video {
   display: block;
 
   width: 100%;
+  height: auto;
 
   aspect-ratio: 16 / 9;
 
-  background: #000000;
+  object-fit: contain;
+
+  background: #000;
 }
 
-.video-controls {
+
+/* =========================
+   CONTRÔLES RAPIDES
+========================= */
+
+.quick-controls {
   display: flex;
+
   align-items: center;
   justify-content: center;
 
-  gap: 12px;
+  gap: 10px;
 
-  padding: 14px;
+  min-height: 58px;
+
+  padding: 9px 14px;
 
   background: var(--color-surface);
 
-  transition: background-color 0.25s ease;
+  border-top: 1px solid var(--color-border);
 }
 
-.control-button {
+
+/* =========================
+   BOUTONS SECONDAIRES
+========================= */
+
+.quick-button {
+  position: relative;
+
+  width: 42px;
+  height: 38px;
+
   display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 2px;
+
+  padding: 0;
+
+  border: 0;
+  border-radius: 8px;
+
+  background: transparent;
+
+  color: var(--color-text-secondary);
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.18s ease,
+    color 0.18s ease;
+}
+
+.quick-button:hover {
+  background: var(--color-surface-secondary);
+
+  color: var(--color-text);
+}
+
+.quick-button:active {
+  transform: scale(0.96);
+}
+
+.quick-button span {
+  font-size: 8px;
+
+  font-weight: 700;
+
+  line-height: 1;
+}
+
+
+/* =========================
+   PLAY
+========================= */
+
+.play-button {
+  width: 42px;
+  height: 42px;
+
+  display: flex;
+
   align-items: center;
   justify-content: center;
 
   padding: 0;
 
-  border: none;
+  border: 0;
+  border-radius: 10px;
+
+  background: var(--color-text);
+
+  color: var(--color-surface);
 
   cursor: pointer;
 
   transition:
-    transform 0.15s ease,
-    background-color 0.2s ease,
-    color 0.2s ease;
-}
-
-.control-button:hover {
-  transform: scale(1.05);
-}
-
-.control-button:active {
-  transform: scale(0.96);
-}
-
-.control-button.secondary {
-  width: 38px;
-  height: 38px;
-
-  border-radius: 50%;
-
-  background: var(--color-surface-secondary);
-  color: var(--color-text-secondary);
-
-  transition:
-    background-color 0.25s ease,
-    color 0.25s ease,
+    opacity 0.18s ease,
     transform 0.15s ease;
 }
 
-.control-button.secondary:hover {
-  background: var(--color-surface-hover);
-  color: var(--color-text);
+.play-button:hover {
+  opacity: 0.88;
 }
 
-.control-button.play {
-  width: 50px;
-  height: 50px;
-
-  border-radius: 50%;
-
-  background: var(--color-text);
-  color: var(--color-surface);
-
-  transition:
-    background-color 0.25s ease,
-    color 0.25s ease,
-    transform 0.15s ease;
+.play-button:active {
+  transform: scale(0.95);
 }
+
+
+/* =========================
+   ERREUR
+========================= */
+
+.video-error {
+  position: absolute;
+
+  inset: 0;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 10px;
+
+  padding: 20px;
+
+  background: rgba(0, 0, 0, 0.82);
+
+  color: #fff;
+
+  text-align: center;
+}
+
+.video-error p {
+  margin: 0;
+
+  font-size: 13px;
+}
+
+.video-error button {
+  min-height: 34px;
+
+  padding: 0 13px;
+
+  border: 1px solid rgba(255, 255, 255, 0.3);
+
+  border-radius: 8px;
+
+  background: transparent;
+
+  color: #fff;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.video-error button:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+
+/* =========================
+   MOBILE
+========================= */
 
 @media (max-width: 480px) {
-  .video-controls {
-    gap: 10px;
 
-    padding: 12px;
+  .quick-controls {
+    min-height: 54px;
+
+    gap: 7px;
+
+    padding: 7px 10px;
   }
 
-  .control-button.secondary {
-    width: 36px;
+  .quick-button {
+    width: 40px;
     height: 36px;
   }
 
-  .control-button.play {
-    width: 48px;
-    height: 48px;
+  .play-button {
+    width: 40px;
+    height: 40px;
   }
 }
 </style>
