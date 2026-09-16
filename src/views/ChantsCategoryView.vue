@@ -26,18 +26,7 @@ const chants = computed(() => {
         description: 'Un moment de méditation dans la présence de Dieu.',
         author: 'Équipe TCHB',
       },
-      {
-        id: 2,
-        title: 'Près de toi',
-        description: 'Un chant pour accompagner la méditation.',
-        author: 'Groupe de méditation',
-      },
-      {
-        id: 3,
-        title: 'Ta Parole',
-        description: 'Méditation autour de la Parole de Dieu.',
-        author: 'Équipe TCHB',
-      },
+
     ]
   }
 
@@ -48,18 +37,7 @@ const chants = computed(() => {
       description: 'Un chant de louange pour célébrer la fidélité de Dieu.',
       author: 'Équipe de louange',
     },
-    {
-      id: 2,
-      title: 'Nous t’adorons',
-      description: 'Un moment de louange et d’adoration.',
-      author: 'Groupe de louange TCHB',
-    },
-    {
-      id: 3,
-      title: 'Élevons son nom',
-      description: 'Un chant pour célébrer et glorifier Dieu.',
-      author: 'Équipe de louange',
-    },
+
   ]
 })
 </script>

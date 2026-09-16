@@ -50,73 +50,21 @@ const chants = {
       video: '/media/chants/louange/dieu-est-fidele.mp4',
     },
 
-    2: {
-      title: 'Nous t’adorons',
-      description:
-        'Un moment de louange et d’adoration consacré à Dieu.',
-      author: 'Groupe de louange TCHB',
-      date: '07 septembre 2026',
-
-      audio: '/media/chants/louange/nous-t-adorons.mp3',
-      video: null,
-    },
-
-    3: {
-      title: 'Élevons son nom',
-      description:
-        'Un chant pour célébrer et glorifier le nom de Dieu.',
-      author: 'Équipe de louange',
-      date: '31 août 2026',
-
-      audio: null,
-      video: '/media/chants/louange/elevons-son-nom.mp4',
-    },
-
-    4: {
-      title: 'Nous célébrons ton nom',
-      description:
-        'Un chant de célébration et de reconnaissance.',
-      author: 'Équipe de louange',
-      date: '24 août 2026',
-
-      audio: '/media/chants/louange/nous-celebrons-ton-nom.mp3',
-      video: null,
-    },
+ 
   },
 
   meditation: {
     1: {
-      title: 'Dans ta présence',
-      description:
+        title: 'Dans ta présence',
+        description:
         'Un moment de méditation dans la présence de Dieu.',
-      author: 'Équipe TCHB',
-      date: '10 septembre 2026',
+        author: 'Équipe TCHB',
+        date: '10 septembre 2026',
 
-      audio: '/media/chants/meditation/dans-ta-presence.mp3',
-      video: '/media/chants/meditation/dans-ta-presence.mp4',
+        audio: '/media/chants/meditation/quand lappel retentira.mp3',
+        video: '/media/chants/meditation/BONNY_MWAITEGE_-_NJOO_UFANYIWE_MAOMBI(360p).mp4',
     },
-
-    2: {
-      title: 'Près de toi',
-      description:
-        'Un chant pour accompagner un moment de méditation.',
-      author: 'Groupe de méditation',
-      date: '03 septembre 2026',
-
-      audio: '/media/chants/meditation/pres-de-toi.mp3',
-      video: null,
-    },
-
-    3: {
-      title: 'Ta Parole',
-      description:
-        'Une méditation autour de la Parole de Dieu.',
-      author: 'Équipe TCHB',
-      date: '28 août 2026',
-
-      audio: null,
-      video: '/media/chants/meditation/ta-parole.mp4',
-    },
+   
   },
 }
 

@@ -22,7 +22,7 @@ const props = defineProps({
 
   title: {
     type: String,
-    default: 'Audio de la prédication',
+
   },
 })
 
@@ -289,7 +289,7 @@ onBeforeUnmount(() => {
       <div class="audio-player-info">
 
         <span>
-          Écouter la prédication
+          Écouter l'audio
         </span>
 
         <strong>
