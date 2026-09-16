@@ -11,6 +11,9 @@ import {
 import { computed } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 
+import AudioPlayer from '@/components/AudioPlayer.vue'
+import VideoPlayer from '@/components/VideoPlayer.vue'
+
 const route = useRoute()
 
 /*
@@ -29,8 +32,8 @@ const category = computed(() => {
 |--------------------------------------------------------------------------
 | Données temporaires
 |--------------------------------------------------------------------------
-| Ces données servent uniquement à tester la navigation.
-| Elles seront remplacées plus tard par l'API Laravel.
+| Ces données servent uniquement à tester l'affichage
+| et les lecteurs avant l'intégration de l'API Laravel.
 |--------------------------------------------------------------------------
 */
 
@@ -42,8 +45,9 @@ const chants = {
         'Un chant de louange pour célébrer la fidélité de Dieu dans nos vies.',
       author: 'Équipe de louange',
       date: '12 septembre 2026',
-      hasAudio: true,
-      hasVideo: true,
+
+      audio: '/media/chants/louange/dieu-est-fidele.mp3',
+      video: '/media/chants/louange/dieu-est-fidele.mp4',
     },
 
     2: {
@@ -52,8 +56,9 @@ const chants = {
         'Un moment de louange et d’adoration consacré à Dieu.',
       author: 'Groupe de louange TCHB',
       date: '07 septembre 2026',
-      hasAudio: true,
-      hasVideo: false,
+
+      audio: '/media/chants/louange/nous-t-adorons.mp3',
+      video: null,
     },
 
     3: {
@@ -62,8 +67,9 @@ const chants = {
         'Un chant pour célébrer et glorifier le nom de Dieu.',
       author: 'Équipe de louange',
       date: '31 août 2026',
-      hasAudio: false,
-      hasVideo: true,
+
+      audio: null,
+      video: '/media/chants/louange/elevons-son-nom.mp4',
     },
 
     4: {
@@ -72,8 +78,9 @@ const chants = {
         'Un chant de célébration et de reconnaissance.',
       author: 'Équipe de louange',
       date: '24 août 2026',
-      hasAudio: true,
-      hasVideo: false,
+
+      audio: '/media/chants/louange/nous-celebrons-ton-nom.mp3',
+      video: null,
     },
   },
 
@@ -84,8 +91,9 @@ const chants = {
         'Un moment de méditation dans la présence de Dieu.',
       author: 'Équipe TCHB',
       date: '10 septembre 2026',
-      hasAudio: true,
-      hasVideo: true,
+
+      audio: '/media/chants/meditation/dans-ta-presence.mp3',
+      video: '/media/chants/meditation/dans-ta-presence.mp4',
     },
 
     2: {
@@ -94,8 +102,9 @@ const chants = {
         'Un chant pour accompagner un moment de méditation.',
       author: 'Groupe de méditation',
       date: '03 septembre 2026',
-      hasAudio: true,
-      hasVideo: false,
+
+      audio: '/media/chants/meditation/pres-de-toi.mp3',
+      video: null,
     },
 
     3: {
@@ -104,8 +113,9 @@ const chants = {
         'Une méditation autour de la Parole de Dieu.',
       author: 'Équipe TCHB',
       date: '28 août 2026',
-      hasAudio: false,
-      hasVideo: true,
+
+      audio: null,
+      video: '/media/chants/meditation/ta-parole.mp4',
     },
   },
 }
@@ -119,16 +129,42 @@ const chants = {
 const chant = computed(() => {
   return chants[route.params.category]?.[route.params.id] ?? null
 })
+
+/*
+|--------------------------------------------------------------------------
+| Présence de médias
+|--------------------------------------------------------------------------
+*/
+
+const hasAudio = computed(() => {
+  return Boolean(chant.value?.audio)
+})
+
+const hasVideo = computed(() => {
+  return Boolean(chant.value?.video)
+})
+
+const hasMedia = computed(() => {
+  return hasAudio.value || hasVideo.value
+})
 </script>
 
+
 <template>
-  <!-- Chant trouvé -->
+
+  <!-- =====================================================
+       CHANT TROUVÉ
+  ====================================================== -->
+
   <section
     v-if="chant"
     class="detail-view"
   >
 
-    <!-- Retour -->
+    <!-- =========================
+         RETOUR
+    ========================== -->
+
     <RouterLink
       :to="`/chants/${route.params.category}`"
       class="back-link"
@@ -143,7 +179,11 @@ const chant = computed(() => {
       </span>
     </RouterLink>
 
-    <!-- En-tête -->
+
+    <!-- =========================
+         EN-TÊTE
+    ========================== -->
+
     <header class="detail-header">
 
       <div class="detail-icon">
@@ -167,10 +207,15 @@ const chant = computed(() => {
 
     </header>
 
-    <!-- Informations -->
+
+    <!-- =========================
+         INFORMATIONS
+    ========================== -->
+
     <div class="metadata">
 
       <div class="metadata-item">
+
         <User
           :size="17"
           :stroke-width="2"
@@ -179,9 +224,12 @@ const chant = computed(() => {
         <span>
           {{ chant.author }}
         </span>
+
       </div>
 
+
       <div class="metadata-item">
+
         <CalendarDays
           :size="17"
           :stroke-width="2"
@@ -190,34 +238,50 @@ const chant = computed(() => {
         <span>
           {{ chant.date }}
         </span>
+
       </div>
 
     </div>
 
-    <!-- Description -->
+
+    <!-- =========================
+         DESCRIPTION
+    ========================== -->
+
     <section
       v-if="chant.description"
       class="description-section"
     >
+
       <p>
         {{ chant.description }}
       </p>
+
     </section>
 
-    <!-- Médias -->
+
+    <!-- =================================================
+         CONTENU MULTIMÉDIA
+    ================================================== -->
+
     <section class="media-section">
 
       <h2>
         Contenu
       </h2>
 
-      <div class="media-list">
 
-        <!-- Audio -->
-        <div
-          v-if="chant.hasAudio"
-          class="media-item"
-        >
+      <!-- =========================
+           AUDIO
+      ========================== -->
+
+      <div
+        v-if="hasAudio"
+        class="media-block"
+      >
+
+        <div class="media-heading">
+
           <div class="media-icon">
             <Headphones
               :size="20"
@@ -226,6 +290,7 @@ const chant = computed(() => {
           </div>
 
           <div class="media-content">
+
             <h3>
               Audio
             </h3>
@@ -233,22 +298,41 @@ const chant = computed(() => {
             <p>
               Écouter ce chant
             </p>
+
           </div>
+
         </div>
 
-        <!-- Vidéo -->
-        <div
-          v-if="chant.hasVideo"
-          class="media-item"
-        >
+
+        <AudioPlayer
+          :src="chant.audio"
+        />
+
+      </div>
+
+
+      <!-- =========================
+           VIDÉO
+      ========================== -->
+
+      <div
+        v-if="hasVideo"
+        class="media-block"
+      >
+
+        <div class="media-heading">
+
           <div class="media-icon">
+
             <Video
               :size="20"
               :stroke-width="2"
             />
+
           </div>
 
           <div class="media-content">
+
             <h3>
               Vidéo
             </h3>
@@ -256,14 +340,25 @@ const chant = computed(() => {
             <p>
               Regarder ce chant
             </p>
+
           </div>
+
         </div>
+
+
+        <VideoPlayer
+          :src="chant.video"
+        />
 
       </div>
 
-      <!-- Aucun média -->
+
+      <!-- =========================
+           AUCUN MÉDIA
+      ========================== -->
+
       <div
-        v-if="!chant.hasAudio && !chant.hasVideo"
+        v-if="!hasMedia"
         class="no-media"
       >
         Aucun contenu multimédia disponible.
@@ -273,7 +368,11 @@ const chant = computed(() => {
 
   </section>
 
-  <!-- Chant introuvable -->
+
+  <!-- =====================================================
+       CHANT INTROUVABLE
+  ====================================================== -->
+
   <section
     v-else
     class="not-found"
@@ -297,20 +396,26 @@ const chant = computed(() => {
     </RouterLink>
 
   </section>
+
 </template>
 
+
 <style scoped>
+
+/* =========================
+   CONTENEUR
+========================= */
+
 .detail-view {
   display: flex;
   flex-direction: column;
   gap: 24px;
 }
 
-/*
-|--------------------------------------------------------------------------
-| Retour
-|--------------------------------------------------------------------------
-*/
+
+/* =========================
+   RETOUR
+========================= */
 
 .back-link {
   display: inline-flex;
@@ -333,11 +438,10 @@ const chant = computed(() => {
   color: var(--color-text);
 }
 
-/*
-|--------------------------------------------------------------------------
-| En-tête
-|--------------------------------------------------------------------------
-*/
+
+/* =========================
+   EN-TÊTE
+========================= */
 
 .detail-header {
   display: flex;
@@ -387,11 +491,10 @@ const chant = computed(() => {
   line-height: 1.25;
 }
 
-/*
-|--------------------------------------------------------------------------
-| Métadonnées
-|--------------------------------------------------------------------------
-*/
+
+/* =========================
+   MÉTADONNÉES
+========================= */
 
 .metadata {
   display: flex;
@@ -409,11 +512,10 @@ const chant = computed(() => {
   gap: 7px;
 }
 
-/*
-|--------------------------------------------------------------------------
-| Description
-|--------------------------------------------------------------------------
-*/
+
+/* =========================
+   DESCRIPTION
+========================= */
 
 .description-section {
   color: var(--color-text-secondary);
@@ -426,18 +528,17 @@ const chant = computed(() => {
   margin: 0;
 }
 
-/*
-|--------------------------------------------------------------------------
-| Médias
-|--------------------------------------------------------------------------
-*/
+
+/* =========================
+   MÉDIAS
+========================= */
 
 .media-section {
   padding-top: 4px;
 }
 
 .media-section h2 {
-  margin: 0 0 12px;
+  margin: 0 0 14px;
 
   color: var(--color-text);
 
@@ -445,18 +546,35 @@ const chant = computed(() => {
   font-weight: 650;
 }
 
-.media-list {
+
+/* =========================
+   BLOC MÉDIA
+========================= */
+
+.media-block {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+
+  gap: 12px;
+
+  margin-bottom: 20px;
 }
 
-.media-item {
+.media-block:last-child {
+  margin-bottom: 0;
+}
+
+
+/* =========================
+   EN-TÊTE MÉDIA
+========================= */
+
+.media-heading {
   display: flex;
   align-items: center;
   gap: 13px;
 
-  padding: 15px;
+  padding: 13px;
 
   background: var(--color-surface);
 
@@ -477,6 +595,7 @@ const chant = computed(() => {
   border-radius: 11px;
 
   background: var(--color-surface-secondary);
+
   color: var(--color-text);
 }
 
@@ -501,6 +620,11 @@ const chant = computed(() => {
   font-size: 12px;
 }
 
+
+/* =========================
+   AUCUN MÉDIA
+========================= */
+
 .no-media {
   padding: 16px;
 
@@ -513,11 +637,10 @@ const chant = computed(() => {
   font-size: 13px;
 }
 
-/*
-|--------------------------------------------------------------------------
-| Introuvable
-|--------------------------------------------------------------------------
-*/
+
+/* =========================
+   INTRouvable
+========================= */
 
 .not-found {
   display: flex;
@@ -554,4 +677,5 @@ const chant = computed(() => {
   font-size: 14px;
   font-weight: 500;
 }
+
 </style>
