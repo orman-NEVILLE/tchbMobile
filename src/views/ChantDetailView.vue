@@ -1,4 +1,3 @@
-```vue
 <script setup>
 import {
   ArrowLeft,
@@ -556,33 +555,3 @@ const chant = computed(() => {
   font-weight: 500;
 }
 </style>
-```
-
-### Vérification
-
-Avec les routes que nous avons définies, tu peux maintenant tester :
-
-```text
-/ chants
-       │
-       ├── Louange
-       │      │
-       │      ├── Dieu est fidèle
-       │      │       └── /chants/louange/1
-       │      │
-       │      ├── Nous t’adorons
-       │      │       └── /chants/louange/2
-       │      │
-       │      └── Élevons son nom
-       │              └── /chants/louange/3
-       │
-       └── Méditation
-              │
-              ├── Dans ta présence
-              │       └── /chants/meditation/1
-              │
-              └── Près de toi
-                      └── /chants/meditation/2
-```
-
-Pour l'instant, les blocs **Audio** et **Vidéo** sont volontairement des indications de disponibilité. Une fois que la navigation sera validée, on pourra remplacer ces blocs par tes composants `AudioPlayer.vue` et `VideoPlayer.vue` avec de vrais fichiers.
