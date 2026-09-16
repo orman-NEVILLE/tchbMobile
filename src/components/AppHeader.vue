@@ -14,6 +14,12 @@ import ProfileMenu from '@/components/ProfileMenu.vue'
 
 const route = useRoute()
 
+/*
+|--------------------------------------------------------------------------
+| Titre de la page
+|--------------------------------------------------------------------------
+*/
+
 const pageTitle = computed(() => {
   switch (route.name) {
     case 'home':
@@ -22,11 +28,19 @@ const pageTitle = computed(() => {
     case 'preachings':
       return 'Prédications'
 
+    case 'preaching-detail':
+      return 'Prédication'
+
     case 'chants':
       return 'Chants'
 
-    case 'preaching-detail':
-      return 'Prédication'
+    case 'chants-category':
+      return route.params.category === 'meditation'
+        ? 'Méditation'
+        : 'Louange'
+
+    case 'chant-detail':
+      return route.meta.title || 'Chant'
 
     case 'profile':
       return 'Mon profil'
@@ -36,7 +50,14 @@ const pageTitle = computed(() => {
   }
 })
 
+/*
+|--------------------------------------------------------------------------
+| Menu profil
+|--------------------------------------------------------------------------
+*/
+
 const isProfileMenuOpen = ref(false)
+
 const profileWrapper = ref(null)
 
 const toggleProfileMenu = () => {
@@ -56,6 +77,12 @@ const handleClickOutside = (event) => {
   }
 }
 
+/*
+|--------------------------------------------------------------------------
+| Événements
+|--------------------------------------------------------------------------
+*/
+
 onMounted(() => {
   document.addEventListener('click', handleClickOutside)
 })
@@ -69,21 +96,21 @@ onBeforeUnmount(() => {
   <header class="app-header">
     <div class="header-content">
 
-    <RouterLink
-      to="/"
-      class="brand"
-      aria-label="Accueil TCHB"
-    >
-      <img
-        src="/icons/logo-tchb.png"
-        alt="Logo TCHB"
-        class="brand-logo"
-      />
+      <RouterLink
+        to="/"
+        class="brand"
+        aria-label="Accueil TCHB"
+      >
+        <img
+          src="/icons/logo-tchb.png"
+          alt="Logo TCHB"
+          class="brand-logo"
+        />
 
-      <span class="brand-name">
-        {{ pageTitle }}
-      </span>
-    </RouterLink>
+        <span class="brand-name">
+          {{ pageTitle }}
+        </span>
+      </RouterLink>
 
       <!-- Actions -->
       <div class="header-actions">
@@ -92,11 +119,10 @@ onBeforeUnmount(() => {
 
         <!-- Profil -->
         <div
-        ref="profileWrapper"
-        class="profile-wrapper"
-        @click.stop
+          ref="profileWrapper"
+          class="profile-wrapper"
+          @click.stop
         >
-
           <ProfileButton
             @click="toggleProfileMenu"
           />
@@ -105,7 +131,6 @@ onBeforeUnmount(() => {
             v-if="isProfileMenuOpen"
             @close="closeProfileMenu"
           />
-
         </div>
 
       </div>
