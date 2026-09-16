@@ -1,14 +1,13 @@
 <script setup>
 import {
   ArrowLeft,
-  Film,
-  Headphones,
   Music2,
-  PlayCircle,
 } from 'lucide-vue-next'
 
-import { computed, ref } from 'vue'
-import { useRoute, RouterLink } from 'vue-router'
+import { computed } from 'vue'
+import { RouterLink, useRoute } from 'vue-router'
+
+import ChantCard from '@/components/ChantCard.vue'
 
 const route = useRoute()
 
@@ -18,32 +17,56 @@ const category = computed(() => {
     : 'Louange'
 })
 
-const categoryDescription = computed(() => {
-  return category.value === 'Méditation'
-    ? 'Des chants et des moments pour accompagner votre méditation.'
-    : 'Retrouvez les chants et les moments de louange.'
-})
+const chants = computed(() => {
+  if (route.params.category === 'meditation') {
+    return [
+      {
+        id: 1,
+        title: 'Dans ta présence',
+        description: 'Un moment de méditation dans la présence de Dieu.',
+        author: 'Équipe TCHB',
+      },
+      {
+        id: 2,
+        title: 'Près de toi',
+        description: 'Un chant pour accompagner la méditation.',
+        author: 'Groupe de méditation',
+      },
+      {
+        id: 3,
+        title: 'Ta Parole',
+        description: 'Méditation autour de la Parole de Dieu.',
+        author: 'Équipe TCHB',
+      },
+    ]
+  }
 
-const chants = ref([
-  {
-    id: 1,
-    title: 'Moment de louange',
-    description: 'Un temps de louange et d’adoration.',
-    type: 'audio',
-    file: '/media/audio/louange-1.mp3',
-  },
-  {
-    id: 2,
-    title: 'Chant de méditation',
-    description: 'Un moment calme pour méditer la Parole.',
-    type: 'video',
-    file: '/media/videos/meditation-1.mp4',
-  },
-])
+  return [
+    {
+      id: 1,
+      title: 'Dieu est fidèle',
+      description: 'Un chant de louange pour célébrer la fidélité de Dieu.',
+      author: 'Équipe de louange',
+    },
+    {
+      id: 2,
+      title: 'Nous t’adorons',
+      description: 'Un moment de louange et d’adoration.',
+      author: 'Groupe de louange TCHB',
+    },
+    {
+      id: 3,
+      title: 'Élevons son nom',
+      description: 'Un chant pour célébrer et glorifier Dieu.',
+      author: 'Équipe de louange',
+    },
+  ]
+})
 </script>
 
 <template>
   <section class="category-view">
+
     <RouterLink
       to="/chants"
       class="back-link"
@@ -54,89 +77,29 @@ const chants = ref([
     </RouterLink>
 
     <header class="page-header">
-      <div class="header-icon">
-        <Music2 :size="25" />
+      <div class="page-icon">
+        <Music2 :size="23" />
       </div>
 
       <div>
         <h1>{{ category }}</h1>
 
         <p>
-          {{ categoryDescription }}
+          {{ chants.length }}
+          contenu{{ chants.length > 1 ? 's' : '' }}
         </p>
       </div>
     </header>
 
-    <div
-      v-if="chants.length"
-      class="chants-list"
-    >
-      <article
+    <div class="chants-list">
+      <ChantCard
         v-for="chant in chants"
         :key="chant.id"
-        class="chant-item"
-      >
-        <div class="chant-heading">
-          <div class="chant-type">
-            <Headphones
-              v-if="chant.type === 'audio'"
-              :size="19"
-            />
-
-            <Film
-              v-else
-              :size="19"
-            />
-          </div>
-
-          <div class="chant-information">
-            <h2>{{ chant.title }}</h2>
-
-            <p>
-              {{ chant.description }}
-            </p>
-          </div>
-        </div>
-
-        <audio
-          v-if="chant.type === 'audio'"
-          class="media-player"
-          controls
-          preload="metadata"
-          :src="chant.file"
-        />
-
-        <video
-          v-else
-          class="media-player"
-          controls
-          preload="metadata"
-          playsinline
-          :src="chant.file"
-        />
-
-        <div class="chant-footer">
-          <span>
-            {{ chant.type === 'audio' ? 'Audio' : 'Vidéo' }}
-          </span>
-
-          <PlayCircle :size="17" />
-        </div>
-      </article>
+        :chant="chant"
+        :category="route.params.category"
+      />
     </div>
 
-    <div
-      v-else
-      class="empty-state"
-    >
-      <Music2 :size="32" />
-
-      <h2>Aucun contenu disponible</h2>
-
-      <p>
-        Aucun chant n’est encore disponible dans cette catégorie.
-      </p>
-    </div>
   </section>
 </template>
 
@@ -144,7 +107,7 @@ const chants = ref([
 .category-view {
   display: flex;
   flex-direction: column;
-  gap: 26px;
+  gap: 24px;
 }
 
 .back-link {
@@ -159,8 +122,6 @@ const chants = ref([
 
   font-size: 14px;
   font-weight: 500;
-
-  transition: color 0.2s ease;
 }
 
 .back-link:hover {
@@ -169,158 +130,44 @@ const chants = ref([
 
 .page-header {
   display: flex;
-  align-items: flex-start;
-  gap: 14px;
+  align-items: center;
+  gap: 13px;
 }
 
-.header-icon {
+.page-icon {
+  width: 46px;
+  height: 46px;
+
   display: flex;
   align-items: center;
   justify-content: center;
 
-  width: 48px;
-  height: 48px;
-
   flex-shrink: 0;
 
-  color: var(--color-text);
-  background: var(--color-surface-secondary);
+  border-radius: 13px;
 
-  border-radius: 14px;
+  background: var(--color-surface-secondary);
+  color: var(--color-text);
 }
 
 .page-header h1 {
   margin: 0;
-
-  color: var(--color-text);
 
   font-size: 24px;
   font-weight: 700;
 }
 
 .page-header p {
-  margin: 6px 0 0;
+  margin: 4px 0 0;
 
   color: var(--color-text-muted);
 
-  font-size: 14px;
-  line-height: 1.5;
+  font-size: 13px;
 }
 
 .chants-list {
   display: flex;
   flex-direction: column;
-  gap: 18px;
-}
-
-.chant-item {
-  padding: 18px;
-
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: 18px;
-}
-
-.chant-heading {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-}
-
-.chant-type {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  width: 38px;
-  height: 38px;
-
-  flex-shrink: 0;
-
-  color: var(--color-text);
-  background: var(--color-surface-secondary);
-
-  border-radius: 11px;
-}
-
-.chant-information {
-  min-width: 0;
-  flex: 1;
-}
-
-.chant-information h2 {
-  margin: 0;
-
-  color: var(--color-text);
-
-  font-size: 16px;
-  font-weight: 650;
-}
-
-.chant-information p {
-  margin: 5px 0 0;
-
-  color: var(--color-text-muted);
-
-  font-size: 13px;
-  line-height: 1.5;
-}
-
-.media-player {
-  display: block;
-
-  width: 100%;
-
-  margin-top: 18px;
-
-  border-radius: 12px;
-}
-
-video.media-player {
-  aspect-ratio: 16 / 9;
-  object-fit: cover;
-
-  background: #000;
-}
-
-.chant-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  margin-top: 14px;
-
-  color: var(--color-text-muted);
-
-  font-size: 12px;
-}
-
-.empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-
-  padding: 48px 20px;
-
-  color: var(--color-text-muted);
-
-  text-align: center;
-}
-
-.empty-state h2 {
-  margin: 16px 0 6px;
-
-  color: var(--color-text);
-
-  font-size: 17px;
-}
-
-.empty-state p {
-  max-width: 300px;
-
-  margin: 0;
-
-  font-size: 14px;
-  line-height: 1.5;
+  gap: 10px;
 }
 </style>
