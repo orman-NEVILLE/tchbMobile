@@ -33,6 +33,21 @@ const router = createRouter({
       component: ChantsView,
     },
     {
+    path: '/chants',
+    name: 'chants',
+    component: () => import('@/views/ChantsView.vue'),
+    },
+    {
+      path: '/chants/louange',
+      name: 'chants-louange',
+      component: () => import('@/views/ChantsCategoryView.vue'),
+    },
+    {
+      path: '/chants/meditation',
+      name: 'chants-meditation',
+      component: () => import('@/views/ChantsCategoryView.vue'),
+    },
+    {
     path: '/inscription',
     name: 'register-request',
     component: RegisterRequestView,
