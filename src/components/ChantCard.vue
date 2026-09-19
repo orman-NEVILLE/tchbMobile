@@ -33,12 +33,12 @@ const props = defineProps({
         {{ props.chant.title }}
       </h2>
 
-      <p>
+      <p v-if="props.chant.description">
         {{ props.chant.description }}
       </p>
 
       <span>
-        {{ props.chant.author }}
+        {{ props.chant.artist_name }}
       </span>
     </div>
 
