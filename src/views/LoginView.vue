@@ -1,6 +1,5 @@
 <script setup>
 import {
-  ArrowLeft,
   Eye,
   EyeOff,
   KeyRound,
@@ -85,91 +84,104 @@ const goToRegister = () => {
 </script>
 
 <template>
-  <div class="login-page">
+  <main class="login-page">
 
-    <!-- En-tête -->
-    <div class="page-header">
+    <!-- =========================
+         LOGO
+    ========================== -->
+
+    <div class="login-brand">
       <RouterLink
         to="/"
-        class="back-button"
-        aria-label="Retour"
+        class="logo-link"
+        aria-label="Retour à l'accueil"
       >
-        <ArrowLeft :size="20" />
+        <img
+          src="/icons/logo-tchb.png"
+          alt="TCHB"
+          class="logo"
+        />
       </RouterLink>
 
-      <div class="page-header-content">
-        <h1>Connexion</h1>
-
-        <p>
-          Accédez à votre espace TCHB
-        </p>
+      <div class="brand-name">
+        TCHB
       </div>
+
+      <p class="brand-subtitle">
+        Bibliothèque des prédications
+      </p>
     </div>
 
-    <!-- Déjà connecté -->
+    <!-- =========================
+         DÉJÀ CONNECTÉ
+    ========================== -->
+
     <div
       v-if="isAuthenticated"
-      class="already-connected"
+      class="login-card"
     >
-      <div class="already-connected-icon">
-        <LogIn
-          :size="20"
-          :stroke-width="2"
-        />
-      </div>
+      <div class="connected-state">
 
-      <div class="already-connected-content">
-        <strong>
-          Vous êtes déjà connecté
-        </strong>
-
-        <span>
-          Votre session TCHB est active.
-        </span>
-      </div>
-
-      <RouterLink
-        to="/profil"
-        class="profile-link"
-      >
-        Mon profil
-      </RouterLink>
-    </div>
-
-    <!-- Formulaire -->
-    <template v-else>
-
-      <!-- Introduction -->
-      <section class="login-intro">
-        <div class="login-icon">
+        <div class="connected-icon">
           <LogIn
-            :size="24"
+            :size="22"
             :stroke-width="2"
           />
         </div>
 
-        <div>
-          <h2>Bienvenue</h2>
+        <div class="connected-content">
+          <h1>
+            Vous êtes déjà connecté
+          </h1>
 
           <p>
-            Connectez-vous avec les identifiants
-            qui vous ont été communiqués.
+            Votre session TCHB est actuellement active.
           </p>
         </div>
-      </section>
+
+        <RouterLink
+          to="/profil"
+          class="primary-button"
+        >
+          Mon profil
+        </RouterLink>
+      </div>
+    </div>
+
+    <!-- =========================
+         CONNEXION
+    ========================== -->
+
+    <section
+      v-else
+      class="login-card"
+    >
+
+      <div class="login-heading">
+        <h1>
+          Bienvenue
+        </h1>
+
+        <p>
+          Connectez-vous à votre espace pour accéder
+          à vos prédications.
+        </p>
+      </div>
 
       <form
         class="login-form"
         @submit.prevent="submitLogin"
       >
 
-        <!-- Numéro de téléphone -->
+        <!-- Téléphone -->
         <div class="form-group">
+
           <label for="phone_number">
             Numéro de téléphone
           </label>
 
           <div class="input-wrapper">
+
             <MessageCircle
               :size="18"
               class="input-icon"
@@ -184,16 +196,21 @@ const goToRegister = () => {
               autocomplete="tel"
               required
             />
+
           </div>
         </div>
 
         <!-- Mot de passe -->
         <div class="form-group">
-          <label for="password">
-            Mot de passe
-          </label>
+
+          <div class="label-row">
+            <label for="password">
+              Mot de passe
+            </label>
+          </div>
 
           <div class="input-wrapper">
+
             <KeyRound
               :size="18"
               class="input-icon"
@@ -220,11 +237,6 @@ const goToRegister = () => {
                   ? 'Masquer le mot de passe'
                   : 'Afficher le mot de passe'
               "
-              :title="
-                showPassword
-                  ? 'Masquer le mot de passe'
-                  : 'Afficher le mot de passe'
-              "
               @click="
                 showPassword = !showPassword
               "
@@ -239,6 +251,7 @@ const goToRegister = () => {
                 :size="18"
               />
             </button>
+
           </div>
         </div>
 
@@ -246,16 +259,20 @@ const goToRegister = () => {
         <div
           v-if="errorMessage"
           class="error-message"
+          role="alert"
         >
-          {{ errorMessage }}
+          <span>
+            {{ errorMessage }}
+          </span>
         </div>
 
-        <!-- Bouton -->
+        <!-- Connexion -->
         <button
           type="submit"
           class="submit-button"
           :disabled="isSubmitting"
         >
+
           <LoaderCircle
             v-if="isSubmitting"
             class="loading-icon"
@@ -274,14 +291,23 @@ const goToRegister = () => {
                 : 'Se connecter'
             }}
           </span>
+
         </button>
+
       </form>
 
       <!-- Inscription -->
       <div class="register-section">
-        <span>
+
+        <div class="register-separator">
+          <span></span>
+          <small>OU</small>
+          <span></span>
+        </div>
+
+        <p>
           Vous n'avez pas encore de compte ?
-        </span>
+        </p>
 
         <button
           type="button"
@@ -291,234 +317,209 @@ const goToRegister = () => {
           <UserPlus :size="17" />
 
           <span>
-            Créer un compte
+            Demander un compte
           </span>
         </button>
+
       </div>
 
-      <!-- Information -->
-      <div class="info-box">
-        <MessageCircle :size="18" />
+    </section>
 
-        <p>
-          Vos identifiants de connexion vous sont
-          communiqués après validation de votre
-          demande d'inscription.
-        </p>
-      </div>
+    <!-- =========================
+         FOOTER
+    ========================== -->
 
-    </template>
+    <footer class="login-footer">
+      <p>
+        © {{ new Date().getFullYear() }} TCHB
+      </p>
 
-  </div>
+      <span>
+        Vos identifiants vous sont communiqués
+        après validation de votre demande.
+      </span>
+    </footer>
+
+  </main>
 </template>
 
 <style scoped>
+/* ========================================
+   PAGE
+======================================== */
+
 .login-page {
+  min-height: 100vh;
   width: 100%;
-  max-width: 560px;
-  margin: 0 auto;
-}
 
-/* =========================
-   HEADER
-========================= */
-
-.page-header {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  margin-bottom: 28px;
-}
-
-.back-button {
-  width: 40px;
-  height: 40px;
-  flex-shrink: 0;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  border: 1px solid var(--color-border);
-  border-radius: 50%;
-
-  background: var(--color-surface);
-  color: var(--color-text-secondary);
-
-  text-decoration: none;
-
-  transition:
-    background-color 0.2s ease,
-    color 0.2s ease,
-    border-color 0.2s ease,
-    transform 0.15s ease;
-}
-
-.back-button:hover {
-  background: var(--color-surface-hover);
-  color: var(--color-text);
-}
-
-.back-button:active {
-  transform: scale(0.96);
-}
-
-.page-header-content {
-  min-width: 0;
-}
-
-.page-header-content h1 {
-  margin: 0;
-
-  color: var(--color-text);
-
-  font-size: 22px;
-  font-weight: 700;
-}
-
-.page-header-content p {
-  margin: 4px 0 0;
-
-  color: var(--color-text-muted);
-
-  font-size: 13px;
-}
-
-/* =========================
-   INTRO
-========================= */
-
-.login-intro {
-  display: flex;
-  align-items: flex-start;
-  gap: 14px;
-
-  padding: 18px;
-  margin-bottom: 26px;
-
-  background: var(--color-surface-secondary);
-  border: 1px solid var(--color-border);
-  border-radius: 14px;
-}
-
-.login-icon {
-  width: 44px;
-  height: 44px;
-  flex-shrink: 0;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  border-radius: 11px;
-
-  background: var(--color-text);
-  color: var(--color-surface);
-}
-
-.login-intro h2 {
-  margin: 0;
-
-  color: var(--color-text);
-
-  font-size: 15px;
-  font-weight: 650;
-}
-
-.login-intro p {
-  margin: 5px 0 0;
-
-  color: var(--color-text-secondary);
-
-  font-size: 13px;
-  line-height: 1.5;
-}
-
-/* =========================
-   ALREADY CONNECTED
-========================= */
-
-.already-connected {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-
-  padding: 16px;
-
-  border: 1px solid var(--color-border);
-  border-radius: 12px;
-
-  background: var(--color-surface);
-}
-
-.already-connected-icon {
-  width: 40px;
-  height: 40px;
-  flex-shrink: 0;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  border-radius: 9px;
-
-  background: var(--color-surface-secondary);
-  color: var(--color-text-secondary);
-}
-
-.already-connected-content {
-  min-width: 0;
-  flex: 1;
+  box-sizing: border-box;
 
   display: flex;
   flex-direction: column;
-  gap: 3px;
-}
+  align-items: center;
 
-.already-connected-content strong {
+  padding: 40px 20px 28px;
+
+  background:
+    radial-gradient(
+      circle at 50% 0%,
+      color-mix(
+        in srgb,
+        var(--color-text) 4%,
+        transparent
+      ),
+      transparent 420px
+    ),
+    var(--color-background, var(--color-surface));
+
   color: var(--color-text);
-
-  font-size: 13px;
-  font-weight: 600;
 }
 
-.already-connected-content span {
-  color: var(--color-text-muted);
+/* ========================================
+   BRAND / LOGO
+======================================== */
 
-  font-size: 11px;
+.login-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  margin-bottom: 28px;
+
+  text-align: center;
 }
 
-.profile-link {
-  flex-shrink: 0;
+.logo-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-  padding: 8px 10px;
+  width: 82px;
+  height: 82px;
 
-  border-radius: 8px;
+  margin-bottom: 13px;
 
-  background: var(--color-surface-secondary);
-  color: var(--color-text);
+  border-radius: 20px;
 
-  text-decoration: none;
+  background: var(--color-surface);
 
-  font-size: 12px;
-  font-weight: 600;
+  border: 1px solid var(--color-border);
+
+  box-shadow:
+    0 8px 24px
+    color-mix(
+      in srgb,
+      var(--color-text) 7%,
+      transparent
+    );
+
+  overflow: hidden;
 
   transition:
-    background-color 0.2s ease;
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
-.profile-link:hover {
-  background: var(--color-surface-hover);
+.logo-link:hover {
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 12px 30px
+    color-mix(
+      in srgb,
+      var(--color-text) 10%,
+      transparent
+    );
 }
 
-/* =========================
+.logo {
+  width: 100%;
+  height: 100%;
+
+  display: block;
+
+  object-fit: cover;
+}
+
+.brand-name {
+  color: var(--color-text);
+
+  font-size: 20px;
+  font-weight: 750;
+  letter-spacing: 0.08em;
+}
+
+.brand-subtitle {
+  margin: 5px 0 0;
+
+  color: var(--color-text-muted);
+
+  font-size: 12px;
+}
+
+/* ========================================
+   CARD
+======================================== */
+
+.login-card {
+  width: 100%;
+  max-width: 430px;
+
+  box-sizing: border-box;
+
+  padding: 30px;
+
+  background: var(--color-surface);
+
+  border: 1px solid var(--color-border);
+
+  border-radius: 18px;
+
+  box-shadow:
+    0 18px 45px
+    color-mix(
+      in srgb,
+      var(--color-text) 7%,
+      transparent
+    );
+}
+
+/* ========================================
+   HEADING
+======================================== */
+
+.login-heading {
+  margin-bottom: 26px;
+}
+
+.login-heading h1 {
+  margin: 0;
+
+  color: var(--color-text);
+
+  font-size: 24px;
+  font-weight: 720;
+
+  letter-spacing: -0.02em;
+}
+
+.login-heading p {
+  margin: 8px 0 0;
+
+  color: var(--color-text-secondary);
+
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+/* ========================================
    FORM
-========================= */
+======================================== */
 
 .login-form {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 19px;
 }
 
 .form-group {
@@ -534,9 +535,15 @@ const goToRegister = () => {
   font-weight: 600;
 }
 
-/* =========================
+.label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* ========================================
    INPUT
-========================= */
+======================================== */
 
 .input-wrapper {
   position: relative;
@@ -563,11 +570,12 @@ const goToRegister = () => {
 
 .input-wrapper input {
   width: 100%;
-  height: 48px;
+  height: 50px;
 
   box-sizing: border-box;
 
-  padding: 0 46px 0 42px;
+  padding:
+    0 46px 0 43px;
 
   border: 1px solid var(--color-border);
   border-radius: 10px;
@@ -582,13 +590,16 @@ const goToRegister = () => {
 
   transition:
     border-color 0.2s ease,
-    background-color 0.25s ease,
-    color 0.25s ease,
-    box-shadow 0.2s ease;
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
 }
 
 .input-wrapper input::placeholder {
   color: var(--color-text-muted);
+}
+
+.input-wrapper input:hover {
+  border-color: var(--color-text-muted);
 }
 
 .input-wrapper input:focus {
@@ -603,9 +614,9 @@ const goToRegister = () => {
     );
 }
 
-/* =========================
+/* ========================================
    PASSWORD
-========================= */
+======================================== */
 
 .password-toggle {
   position: absolute;
@@ -624,6 +635,7 @@ const goToRegister = () => {
   border-radius: 8px;
 
   background: transparent;
+
   color: var(--color-text-muted);
 
   cursor: pointer;
@@ -638,37 +650,40 @@ const goToRegister = () => {
   color: var(--color-text);
 }
 
-/* =========================
+/* ========================================
    ERROR
-========================= */
+======================================== */
 
 .error-message {
-  padding: 12px 14px;
+  padding: 11px 13px;
 
   border: 1px solid var(--color-border);
+
   border-radius: 9px;
 
   background: var(--color-surface-secondary);
+
   color: var(--color-text-secondary);
 
   font-size: 12px;
   line-height: 1.5;
 }
 
-/* =========================
+/* ========================================
    SUBMIT
-========================= */
+======================================== */
 
 .submit-button {
   width: 100%;
-  height: 48px;
+  height: 50px;
 
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
 
-  margin-top: 2px;
+  margin-top: 3px;
+
   padding: 0 18px;
 
   border: none;
@@ -693,7 +708,7 @@ const goToRegister = () => {
 }
 
 .submit-button:active:not(:disabled) {
-  transform: scale(0.99);
+  transform: scale(0.985);
 }
 
 .submit-button:disabled {
@@ -711,112 +726,226 @@ const goToRegister = () => {
   }
 }
 
-/* =========================
+/* ========================================
    REGISTER
-========================= */
+======================================== */
 
 .register-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 9px;
-
   margin-top: 26px;
+
+  text-align: center;
+}
+
+.register-separator {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  margin-bottom: 18px;
+}
+
+.register-separator span {
+  flex: 1;
+
+  height: 1px;
+
+  background: var(--color-border);
+}
+
+.register-separator small {
+  color: var(--color-text-muted);
+
+  font-size: 9px;
+  font-weight: 600;
+
+  letter-spacing: 0.08em;
+}
+
+.register-section p {
+  margin: 0 0 11px;
 
   color: var(--color-text-muted);
 
   font-size: 12px;
-  text-align: center;
 }
 
 .register-button {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 7px;
 
-  padding: 7px 10px;
+  min-height: 38px;
 
-  border: none;
-  border-radius: 8px;
+  padding: 0 14px;
 
-  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: 9px;
+
+  background: var(--color-surface);
+
   color: var(--color-text);
 
   font-family: inherit;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
 
   cursor: pointer;
 
   transition:
-    background-color 0.2s ease;
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.15s ease;
 }
 
 .register-button:hover {
   background: var(--color-surface-hover);
+  border-color: var(--color-text-muted);
 }
 
-/* =========================
-   INFO
-========================= */
+.register-button:active {
+  transform: scale(0.98);
+}
 
-.info-box {
+/* ========================================
+   ALREADY CONNECTED
+======================================== */
+
+.connected-state {
   display: flex;
-  align-items: flex-start;
-  gap: 10px;
+  flex-direction: column;
+  align-items: center;
 
-  margin-top: 22px;
-  padding: 14px;
-
-  border: 1px solid var(--color-border);
-  border-radius: 10px;
-
-  background: var(--color-surface);
-  color: var(--color-text-muted);
+  text-align: center;
 }
 
-.info-box svg {
-  flex-shrink: 0;
-  margin-top: 1px;
+.connected-icon {
+  width: 50px;
+  height: 50px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-bottom: 15px;
+
+  border-radius: 12px;
+
+  background: var(--color-surface-secondary);
+  color: var(--color-text);
 }
 
-.info-box p {
+.connected-content h1 {
   margin: 0;
 
+  color: var(--color-text);
+
+  font-size: 19px;
+  font-weight: 700;
+}
+
+.connected-content p {
+  margin: 7px 0 22px;
+
+  color: var(--color-text-muted);
+
+  font-size: 12px;
+}
+
+.primary-button {
+  width: 100%;
+  height: 44px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  box-sizing: border-box;
+
+  border-radius: 9px;
+
+  background: var(--color-text);
+  color: var(--color-surface);
+
+  text-decoration: none;
+
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* ========================================
+   FOOTER
+======================================== */
+
+.login-footer {
+  width: 100%;
+  max-width: 430px;
+
+  margin-top: 24px;
+
+  text-align: center;
+}
+
+.login-footer p {
+  margin: 0 0 4px;
+
+  color: var(--color-text-secondary);
+
   font-size: 11px;
+  font-weight: 600;
+}
+
+.login-footer span {
+  display: block;
+
+  color: var(--color-text-muted);
+
+  font-size: 10px;
   line-height: 1.5;
 }
 
-/* =========================
+/* ========================================
    MOBILE
-========================= */
+======================================== */
 
 @media (max-width: 480px) {
-  .page-header {
+  .login-page {
+    min-height: 100dvh;
+
+    padding:
+      28px 16px 22px;
+
+    justify-content: center;
+  }
+
+  .login-brand {
     margin-bottom: 22px;
   }
 
-  .page-header-content h1 {
-    font-size: 20px;
+  .logo-link {
+    width: 70px;
+    height: 70px;
+
+    border-radius: 17px;
   }
 
-  .login-intro {
-    padding: 15px;
+  .brand-name {
+    font-size: 18px;
   }
 
-  .already-connected {
-    align-items: flex-start;
-    flex-wrap: wrap;
+  .login-card {
+    padding: 24px 20px;
+
+    border-radius: 15px;
   }
 
-  .already-connected-content {
-    min-width: calc(100% - 52px);
+  .login-heading h1 {
+    font-size: 22px;
   }
 
-  .profile-link {
-    width: 100%;
-    text-align: center;
-    box-sizing: border-box;
+  .login-footer {
+    margin-top: 20px;
   }
 }
 </style>
+

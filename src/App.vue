@@ -6,6 +6,7 @@ import {
 } from 'lucide-vue-next'
 
 import {
+  computed,
   onMounted,
   ref,
 } from 'vue'
@@ -15,6 +16,19 @@ import { useRoute } from 'vue-router'
 import AppHeader from '@/components/AppHeader.vue'
 
 const route = useRoute()
+
+/*
+|--------------------------------------------------------------------------
+| Pages sans layout principal
+|--------------------------------------------------------------------------
+*/
+
+const isAuthPage = computed(() => {
+  return [
+    'login',
+    'register-request',
+  ].includes(route.name)
+})
 
 /*
 |--------------------------------------------------------------------------
@@ -33,22 +47,6 @@ onMounted(() => {
 /*
 |--------------------------------------------------------------------------
 | Navigation principale
-|--------------------------------------------------------------------------
-|
-| Une rubrique reste active sur toutes ses pages enfants.
-|
-| Accueil
-|   └── home
-|
-| Prédications
-|   ├── preachings
-|   └── preaching-detail
-|
-| Chants
-|   ├── chants
-|   ├── chants-category
-|   └── chant-detail
-|
 |--------------------------------------------------------------------------
 */
 
@@ -118,14 +116,19 @@ const isNavActive = (section) => {
          HEADER
     ========================== -->
 
-    <AppHeader />
+    <AppHeader v-if="!isAuthPage" />
 
 
     <!-- =========================
          CONTENU
     ========================== -->
 
-    <main class="app-content">
+    <main
+      class="app-content"
+      :class="{
+        'auth-content': isAuthPage,
+      }"
+    >
       <RouterView />
     </main>
 
@@ -135,6 +138,7 @@ const isNavActive = (section) => {
     ========================== -->
 
     <nav
+      v-if="!isAuthPage"
       class="bottom-navigation"
       aria-label="Navigation principale"
     >
