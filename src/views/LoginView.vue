@@ -86,31 +86,24 @@ const goToRegister = () => {
 <template>
   <main class="login-page">
 
-    <!-- =========================
-         LOGO
-    ========================== -->
+  <!-- =========================
+      LOGO
+  ========================== -->
 
-    <div class="login-brand">
-      <RouterLink
-        to="/"
-        class="logo-link"
-        aria-label="Retour à l'accueil"
-      >
-        <img
-          src="/icons/logo-tchb.png"
-          alt="TCHB"
-          class="logo"
-        />
-      </RouterLink>
+  <div class="login-brand">
+    <RouterLink
+      to="/"
+      class="logo-link"
+      aria-label="Retour à l'accueil"
+    >
+      <img
+        src="/icons/logo-tchb.png"
+        alt="TCHB"
+        class="logo"
+      />
+    </RouterLink>
 
-      <div class="brand-name">
-        TCHB
-      </div>
-
-      <p class="brand-subtitle">
-        Bibliothèque des prédications
-      </p>
-    </div>
+  </div>
 
     <!-- =========================
          DÉJÀ CONNECTÉ
@@ -192,7 +185,7 @@ const goToRegister = () => {
               v-model="phone_number"
               type="tel"
               inputmode="tel"
-              placeholder="+243 81 234 56 78"
+              placeholder="243 81 234 56 78"
               autocomplete="tel"
               required
             />
@@ -383,105 +376,29 @@ const goToRegister = () => {
   display: flex;
   flex-direction: column;
   align-items: center;
-
   margin-bottom: 28px;
-
   text-align: center;
 }
 
 .logo-link {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-
-  width: 82px;
-  height: 82px;
-
-  margin-bottom: 13px;
-
-  border-radius: 20px;
-
-  background: var(--color-surface);
-
-  border: 1px solid var(--color-border);
-
-  box-shadow:
-    0 8px 24px
-    color-mix(
-      in srgb,
-      var(--color-text) 7%,
-      transparent
-    );
-
-  overflow: hidden;
-
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
-}
-
-.logo-link:hover {
-  transform: translateY(-2px);
-
-  box-shadow:
-    0 12px 30px
-    color-mix(
-      in srgb,
-      var(--color-text) 10%,
-      transparent
-    );
+  text-decoration: none;
 }
 
 .logo {
-  width: 100%;
-  height: 100%;
-
   display: block;
-
-  object-fit: cover;
-}
-
-.brand-name {
-  color: var(--color-text);
-
-  font-size: 20px;
-  font-weight: 750;
-  letter-spacing: 0.08em;
+  width: 120px;
+  height: auto;
+  object-fit: contain;
 }
 
 .brand-subtitle {
-  margin: 5px 0 0;
-
+  margin: 14px 0 0;
   color: var(--color-text-muted);
-
-  font-size: 12px;
-}
-
-/* ========================================
-   CARD
-======================================== */
-
-.login-card {
-  width: 100%;
-  max-width: 430px;
-
-  box-sizing: border-box;
-
-  padding: 30px;
-
-  background: var(--color-surface);
-
-  border: 1px solid var(--color-border);
-
-  border-radius: 18px;
-
-  box-shadow:
-    0 18px 45px
-    color-mix(
-      in srgb,
-      var(--color-text) 7%,
-      transparent
-    );
+  font-size: 14px;
+  line-height: 1.5;
 }
 
 /* ========================================

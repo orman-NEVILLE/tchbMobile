@@ -157,7 +157,7 @@ const handleLogout = () => {
               </span>
 
               <strong>
-                {{ user?.whatsapp }}
+                {{ user?.phone_number }}
               </strong>
             </div>
           </div>
