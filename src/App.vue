@@ -60,6 +60,7 @@ const isNavActive = (section) => {
       return [
         'preachings',
         'preaching-detail',
+        'references'
       ].includes(route.name)
 
     case 'chants':
