@@ -55,3 +55,26 @@ export const getSermon = async (id) => {
 
   return data
 }
+
+export const getSermonReferences = async (id) => {
+  const response = await fetch(
+    `${API_BASE_URL}/sermons/${id}/references`,
+    {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+      },
+    }
+  )
+
+  const data = await response.json()
+
+  if (!response.ok) {
+    throw new Error(
+      data.message ||
+        'Impossible de récupérer les références.'
+    )
+  }
+
+  return data
+}
