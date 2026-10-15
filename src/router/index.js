@@ -6,6 +6,7 @@ import PreachingDetailView from '@/views/PreachingDetailView.vue'
 import RegisterRequestView from '@/views/RegisterRequestView.vue'
 import LoginView from '@/views/LoginView.vue'
 import ProfileView from '@/views/ProfileView.vue'
+import SermonReferencesView from '@/views/SermonReferencesView.vue'
 
 
 const router = createRouter({
@@ -56,6 +57,11 @@ const router = createRouter({
     path: '/profil',
     name: 'profile',
     component: ProfileView,
+    },
+    {
+      path: '/predications/:id/references',
+      name: 'sermon-references',
+      component: SermonReferencesView,
     },
   ],
 })

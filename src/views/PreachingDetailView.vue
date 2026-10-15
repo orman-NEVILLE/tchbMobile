@@ -14,6 +14,11 @@ import {
   ref,
 } from 'vue'
 
+import {
+  BookOpen,
+  ChevronRight,
+} from 'lucide-vue-next'
+
 import { useRoute } from 'vue-router'
 
 import AudioPlayer from '@/components/AudioPlayer.vue'
@@ -286,14 +291,30 @@ onMounted(() => {
       </section>
 
 
-      <!-- =========================
-           INFORMATIONS
-      ========================== -->
 
-      <div class="sermon-meta">
+        <!-- RÉFÉRENCES -->
 
+        <div class="sermon-meta">
+          <RouterLink
+            :to="{
+              name: 'sermon-references',
+              params: { id: route.params.id },
+            }"
+            class="references-link"
+          >
+            <div class="references-icon">
+              <BookOpen :size="19" />
+            </div>
 
-      </div>
+            <span>Consulter les références</span>
+
+            <ChevronRight
+              :size="18"
+              class="references-arrow"
+            />
+          </RouterLink>
+        </div>
+
 
 
       <!-- =========================
@@ -491,32 +512,58 @@ onMounted(() => {
 }
 
 
-/* =========================
-   INFORMATIONS
-========================= */
+
+/* RÉFÉRENCES */
 
 .sermon-meta {
-  display: grid;
-
-  grid-template-columns:
-    repeat(3, minmax(0, 1fr));
-
   border-top: 1px solid var(--color-border);
   border-bottom: 1px solid var(--color-border);
 }
 
-.meta-item {
+.references-link {
   display: flex;
   align-items: center;
+  gap: 12px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 14px 4px;
+  color: var(--color-text);
+  text-decoration: none;
+  transition: background-color 0.2s ease;
+}
 
-  gap: 9px;
+.references-link:hover {
+  background: var(--color-surface-hover);
+}
 
-  min-width: 0;
+.references-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  background: var(--color-surface-secondary);
+}
 
-  padding: 15px 16px;
+.references-link span {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 600;
+}
 
+.references-arrow {
+  flex-shrink: 0;
   color: var(--color-text-muted);
 }
+
+.references-link:focus-visible {
+  outline: 2px solid var(--color-text);
+  outline-offset: 3px;
+  border-radius: 8px;
+}
+
 
 .meta-item + .meta-item {
   border-left: 1px solid var(--color-border);
